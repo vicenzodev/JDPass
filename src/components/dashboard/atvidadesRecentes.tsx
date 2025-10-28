@@ -1,4 +1,4 @@
-export default function ActivityLog() {
+export default function AtividadesRecentes() {
   const logs = [
     { id: 1, acao: "Gerou senha para SAP", usuario: "maria.silva", data: "27/10/2025 10:23" },
     { id: 2, acao: "Aprovou solicitação de joao.souza", usuario: "gabriel.teixera", data: "26/10/2025 16:12" },

@@ -1,6 +1,6 @@
 import { FaKey, FaUserShield, FaClock, FaBell, FaUsers } from "react-icons/fa";
 
-export default function DashboardCards() {
+export default function CardsDashboard() {
   const cards = [
     { title: "Senhas Ativas", value: 128, icon: <FaKey />, color: "text-green-600" },
     { title: "Senhas Temporárias", value: 14, icon: <FaClock />, color: "text-yellow-500" },

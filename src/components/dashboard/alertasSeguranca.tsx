@@ -1,6 +1,6 @@
 import { FaExclamationTriangle } from "react-icons/fa";
 
-export default function SecurityAlerts() {
+export default function AlertasSeguranca() {
   const alerts = [
     { id: 1, msg: "Senha do sistema SAP expira em 2 dias", tipo: "warning" },
     { id: 2, msg: "Tentativa de acesso negada - usuário joao.souza", tipo: "danger" },

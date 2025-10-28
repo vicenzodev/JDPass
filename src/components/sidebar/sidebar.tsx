@@ -6,11 +6,29 @@ import { navItems } from './options';
 import Link from 'next/link';
 import { RiLogoutBoxRLine } from 'react-icons/ri';
 import { useLayout } from '../layout/layoutContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function Sidebar() {
   const { sidebarOpen: open, toggleSidebar } = useLayout();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const parent = navItems.find((item) => {
+      if (!item.children) return false;
+      const matchChild = item.children.some((child) => child.href === pathname);
+      const matchPrefix = pathname.startsWith(item.prefix || '');
+      return matchChild || matchPrefix;
+    });
+
+    if (parent) {
+      setActiveMenu(parent.label);
+    } else {
+      setActiveMenu(null);
+    }
+  }, [pathname]);
 
   const toggleMenu = (label: string) => {
     setActiveMenu(activeMenu === label ? null : label);
@@ -19,26 +37,24 @@ export default function Sidebar() {
   return (
     <motion.aside
       initial={false}
-      animate={{ width: open ? 300 : 60 }}
+      animate={{ width: open ? 300 : 80 }}
       transition={{ duration: 0.3 }}
-      className="fixed left-0 top-0 h-screen flex flex-col bg-green-900 backdrop-blur-lg border-r border-white/10 shadow-[0_0_30px_rgba(0,255,0,0.05)] text-white"
+      className="fixed left-0 top-0 h-screen flex flex-col bg-green-900 border-r border-white/10 shadow-[0_0_30px_rgba(0,255,0,0.05)] text-white z-50"
     >
       <div className="flex items-center justify-between p-4 border-b border-white/10">
-        <div className="flex items-center gap-2">
-          {open && (
-            <>
-              <motion.img
-                src="/logo-john-deere.png"
-                alt="John Deere"
-                className="w-8 h-8"
-                whileHover={{ rotate: 10 }}
-              />
-              <span className="font-bold text-lg text-white tracking-wide hover:text-green-400 transition">
-                John Deere Pass
-              </span>
-            </>
-          )}
-        </div>
+        {open && (
+          <div className="flex items-center gap-2">
+            <motion.img
+              src="/logo-john-deere.png"
+              alt="John Deere"
+              className="w-8 h-8"
+              whileHover={{ rotate: 10 }}
+            />
+            <span className="font-bold text-lg text-white tracking-wide hover:text-green-400 transition">
+              John Deere Pass
+            </span>
+          </div>
+        )}
 
         <button
           onClick={toggleSidebar}
@@ -57,38 +73,42 @@ export default function Sidebar() {
               <>
                 <button
                   onClick={() => toggleMenu(item.label)}
-                  className="flex items-center justify-between w-full text-left text-md font-medium
-                  px-3 py-2 rounded-lg hover:bg-white/10 hover:text-green-300 transition cursor-pointer"
+                  className={`flex items-center w-full text-left text-md font-medium 
+                    px-3 py-2 rounded-lg hover:bg-white/10 hover:text-green-300 transition cursor-pointer
+                    ${activeMenu === item.label ? 'bg-white/10' : ''}`}
+                  title={item.label}
                 >
-                  <div className="flex items-center gap-3">
-                    {<item.icon size={22} className="text-green-400" />}
-                    {open && <span>{item.label}</span>}
-                  </div>
-                  {open && (
-                    <FaChevronRight
-                      className={`w-4 h-4 text-gray-300 transition-transform ${
-                        activeMenu === item.label ? 'rotate-90' : 'rotate-0'
-                      }`}
-                    />
-                  )}
+                  <item.icon size={22} className="text-green-400 min-w-[22px]" />
+                  {open && <span className="ml-3">{item.label}</span>}
+                  <FaChevronRight
+                    className={`ml-auto w-4 h-4 text-gray-300 transition-transform ${
+                      activeMenu === item.label ? 'rotate-90' : ''
+                    }`}
+                  />
                 </button>
 
                 <AnimatePresence>
-                  {activeMenu === item.label && open && (
+                  {activeMenu === item.label && (
                     <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="pl-10 mt-1 space-y-1"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="flex flex-col"
                     >
                       {item.children.map((child) => (
                         <Link
                           key={child.label}
                           href={child.href}
-                          className="block text-md text-gray-300 hover:text-green-300 hover:bg-white/10 px-2 py-1 rounded-md transition"
+                          className={`flex items-center text-sm text-gray-200
+                            px-3 py-2 mt-1 rounded-lg hover:bg-white/10 hover:text-green-300 transition
+                            ${open ? 'gap-3' : ''} ${
+                              pathname === child.href ? 'bg-white/10 text-green-300' : ''
+                            }`}
+                          title={child.label}
                         >
-                          {child.label}
+                          <child.icon size={20} className="text-green-400 min-w-[22px]" />
+                          {open && <span>{child.label}</span>}
                         </Link>
                       ))}
                     </motion.div>
@@ -98,10 +118,12 @@ export default function Sidebar() {
             ) : (
               <Link
                 href={item.href ?? '#'}
-                className="flex items-center gap-3 text-md font-medium 
-                px-3 py-2 rounded-lg hover:bg-white/10 hover:text-green-300 transition"
+                className={`flex items-center gap-3 text-md font-medium 
+                px-3 py-2 rounded-lg hover:bg-white/10 hover:text-green-300 transition
+                ${pathname === item.href ? 'bg-white/20 text-green-300' : ''}`}
+                title={item.label}
               >
-                {<item.icon size={22} className="text-green-400" />}
+                <item.icon size={22} className="text-green-400 min-w-[22px]" />
                 {open && <span>{item.label}</span>}
               </Link>
             )}
@@ -109,11 +131,11 @@ export default function Sidebar() {
         ))}
         <hr className="my-3 text-gray-400" />
         <Link
-          href={'/'}
+          href="/"
           className="flex items-center gap-3 text-md font-medium 
           px-3 py-2 rounded-lg hover:bg-white/10 hover:text-green-300 transition"
         >
-          {<RiLogoutBoxRLine size={22} className="text-green-400" />}
+          <RiLogoutBoxRLine size={22} className="text-green-400" />
           {open && <span>Log out</span>}
         </Link>
       </nav>

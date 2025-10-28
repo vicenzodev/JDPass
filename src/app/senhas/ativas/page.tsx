@@ -62,7 +62,7 @@ export default function ListarSenhasPage() {
                 showAddButton
                 filterOptions={[
                     { label: "Identificador", value: "identificador", type: "text" },
-                    { label: "Perfil", value: "perfil", type: "select", options: ["Admin", "User", "Guest"] },
+                    { label: "Perfil", value: "perfil", type: "text" },
                     { label: "Tipo", value: "tipo", type: "text" },
                 ]}
             />
