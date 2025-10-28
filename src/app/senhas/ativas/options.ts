@@ -1,5 +1,4 @@
 import { ColumnProps } from "@/utils/table";
-import { ReactNode } from "react";
 
 type Senha = {
   id: string;

@@ -1,10 +1,10 @@
 "use client";
 
-import ActivityLog from "@/components/dashboard/activityLog";
-import DashboardCards from "@/components/dashboard/dashboardCards";
-import PasswordStatsChart from "@/components/dashboard/passwordStatsChart";
-import RequestsOverview from "@/components/dashboard/requestOverview";
-import SecurityAlerts from "@/components/dashboard/securityAlerts";
+import AtividadesRecentes from "@/components/dashboard/atvidadesRecentes";
+import CardsDashboard from "@/components/dashboard/cardsDashboard";
+import GraficoSenhas from "@/components/dashboard/graficoSenhas";
+import SolicitacoesRecentes from "@/components/dashboard/solicitacoesRecentes";
+import AlertasSeguranca from "@/components/dashboard/alertasSeguranca";
 
 export default function DashboardPage() {
   
@@ -17,17 +17,17 @@ export default function DashboardPage() {
         </p>
       </header>
 
-      <DashboardCards />
+      <CardsDashboard />
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
         <div className="space-y-6">
-          <RequestsOverview />
-          <ActivityLog />
+          <SolicitacoesRecentes />
+          <AtividadesRecentes />
         </div>
 
         <div className="space-y-6">
-          <PasswordStatsChart />
-          <SecurityAlerts />
+          <GraficoSenhas />
+          <AlertasSeguranca />
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
-export default function RequestsOverview() {
+export default function SolicitacoesRecentes() {
   const requests = [
-    { id: 1, sistema: "SAP", usuario: "maria.silva", status: "Pendente" },
-    { id: 2, sistema: "Portal RH", usuario: "joao.souza", status: "Aprovado" },
+    { id: 1, perfil: "db.admin", usuario: "maria.silva", status: "Pendente" },
+    { id: 2, perfil: "product", usuario: "joao.souza", status: "Aprovado" },
   ];
 
   return (
@@ -12,7 +12,7 @@ export default function RequestsOverview() {
       <table className="w-full text-sm">
         <thead>
           <tr className="text-gray-500 border-b border-gray-200">
-            <th className="text-left py-2">Sistema</th>
+            <th className="text-left py-2">Perfil</th>
             <th className="text-left">Usuário</th>
             <th className="text-left">Status</th>
           </tr>
@@ -20,7 +20,7 @@ export default function RequestsOverview() {
         <tbody>
           {requests.map((r) => (
             <tr key={r.id} className="border-b border-gray-100">
-              <td className="py-2">{r.sistema}</td>
+              <td className="py-2">{r.perfil}</td>
               <td>{r.usuario}</td>
               <td
                 className={`font-medium ${

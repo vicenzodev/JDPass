@@ -1,16 +1,26 @@
 import { ElementType } from "react";
 import { TbLayoutDashboard } from "react-icons/tb";
 import { LuFileText, LuKeyRound } from "react-icons/lu";
-import { FaHistory, FaUsers } from "react-icons/fa";
+import { FaHistory, FaUser, FaUsers } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
+import { CgProfile } from "react-icons/cg";
+import { RiLockPasswordFill } from "react-icons/ri";
+import { MdAccessTime } from "react-icons/md";
 
 type NavItem = {
   label: string;
   icon: ElementType<{
     className?: string;
   }>;
+  prefix?: string;
   href?: string;
-  children?: { label: string; href: string }[];
+  children?: {
+    label: string;
+    href: string;
+    icon: ElementType<{
+      className?: string;
+    }>;
+  }[];
   adminOnly?: boolean;
 };
 
@@ -23,9 +33,10 @@ export const navItems: NavItem[] = [
   {
     label: "Gerenciamento de Senhas",
     icon: LuKeyRound,
+    prefix: "/senhas",
     children: [
-      { label: "Senhas Ativas", href: "/senhas/ativas" },
-      { label: "Senhas Temporárias", href: "/senhas/temporarias" },
+      { label: "Senhas Ativas", icon: RiLockPasswordFill, href: "/senhas/ativas" },
+      { label: "Senhas Temporárias", icon: MdAccessTime, href: "/senhas/temporarias" },
     ],
   },
   {
@@ -33,12 +44,13 @@ export const navItems: NavItem[] = [
     icon: LuFileText,
   },
   {
-    label: "Perfis e Acessos",
+    label: "Usuários e Perfis",
     icon: FaUsers,
     adminOnly: true,
+    prefix: "/admin",
     children: [
-      { label: "Gerenciar Usuários", href: "/admin/usuarios" },
-      { label: "Gerenciar Perfis de Acesso", href: "/admin/perfis" },
+      { label: "Gerenciar Usuários", icon: FaUser, href: "/admin/usuarios" },
+      { label: "Gerenciar Perfis de Acesso", icon: CgProfile, href: "/admin/perfis" },
     ],
   },
   {

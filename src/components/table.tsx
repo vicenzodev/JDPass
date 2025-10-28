@@ -11,7 +11,7 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ColumnProps, FilterOption } from "@/utils/table";
 
 interface ActionButton {
@@ -46,12 +46,13 @@ export default function Table({
   extraButtons = [],
 }: DataTableProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [filterField, setFilterField] = useState<string>(
     filterOptions?.[0]?.value ?? columns[0].value
   );
   const [filterValue, setFilterValue] = useState("");
 
-  const [isCardMode, setIsCardMode] = useState(false);
+  const [cardMode, setCardMode] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -123,7 +124,7 @@ export default function Table({
                       setCurrentPage(1);
                     }}
                     placeholder={filterPlaceholder}
-                    className="pl-10 pr-4 h-12 w-60 md:w-64 border-l border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-green-800"
+                    className="pl-10 pr-4 h-12 w-60 md:w-64 border-l border-gray-300 bg-white focus:outline-none"
                   />
                 </div>
               )}
@@ -137,20 +138,20 @@ export default function Table({
               className="p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-200 transition"
               title="Recarregar tabela"
             >
-              <FaSyncAlt size={16} className="text-gray-900" />
+              <FaSyncAlt size={18} className="text-gray-900" />
             </motion.button>
           )}
 
           <motion.button
             whileTap={{ scale: 0.9 }}
-            onClick={() => setIsCardMode((prev) => !prev)}
+            onClick={() => setCardMode((prev) => !prev)}
             className="p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-200 transition"
             title="Alterar modo"
           >
-            {isCardMode ? (
-              <FaTable size={16} className="text-gray-900" />
+            {cardMode ? (
+              <FaTable size={18} className="text-gray-900" />
             ) : (
-              <FaThLarge size={16} className="text-gray-900" />
+              <FaThLarge size={18} className="text-gray-900" />
             )}
           </motion.button>
         </div>
@@ -159,7 +160,7 @@ export default function Table({
           {extraButtons.map((btn, i) => (
             <motion.button
               key={i}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.9 }}
               onClick={btn.onClick}
               className={`flex items-center gap-2 px-6 h-12 rounded-md transition text-sm font-medium ${
                 btn.variant === "outlined"
@@ -174,8 +175,8 @@ export default function Table({
 
           {showAddButton && (
             <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => router.push("/novo")}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => router.push(`${pathname}/novo`)}
               className="flex items-center gap-2 px-6 h-12 bg-green-800 text-white rounded-md hover:bg-green-900 transition text-base font-medium"
             >
               <FaPlus /> Adicionar
@@ -188,7 +189,7 @@ export default function Table({
         <div className="text-center py-12 text-gray-600 animate-pulse">
           Carregando dados...
         </div>
-      ) : isCardMode ? (
+      ) : cardMode ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {paginatedData.length > 0 ? (
             paginatedData.map((row, i) => (
@@ -241,6 +242,7 @@ export default function Table({
                     >
                       {columns.map((col) => (
                         <td
+                          key={`${i}-${col.value}`}
                           className={`py-4 px-4 ${
                            col.align === "center" ? "text-center"
                            : col.align === "right" ? "text-right": "text-left"
@@ -266,7 +268,7 @@ export default function Table({
           </div>
         
 
-          <div className="flex items-center justify-between gap-4 mt-4">
+          <div className="flex items-center justify-between gap-4 mt-6">
             <div>
               <span>{`Mostrando ${startItem} - ${endItem} de ${filteredData.length} registros`}</span>
             </div>
