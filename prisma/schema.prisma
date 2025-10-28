@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UTA{
+  id       Int @id @default(autoincrement())
+  user     String
+  email    String
+  password String //hash do bcrypt
+  cargo    Int @default(0)
+
+  passwords US[]
+  logs Logs[]
+  reqFeitos Requests[] @relation("PedidosFeitos")
+  reqRecebidos Requests[] @relation("PedidosRecebidos")
+}
+
+model US{
+  id          Int @id @default(autoincrement())
+  user        String
+  password    String //A senha criptografada do site
+  last_change DateTime
+  exp_date    DateTime
+  
+  uta UTA @relation(fields: [utaId], references: [id])
+  utaId       Int
+}
+
+model Logs{
+  id     Int @id @default(autoincrement())
+  event  String
+  status String
+  date   DateTime
+
+  uta UTA @relation(fields: [utaId], references: [id])
+  utaId Int
+}
+
+model Requests{
+  id        Int @id @default(autoincrement())
+  status    String
+  date      DateTime
+
+  uta UTA @relation("PedidosFeitos",fields: [utaId], references: [id])
+  utaId     Int
+  rqstUta UTA @relation("PedidosRecebidos",fields: [rqstUtaId], references: [id])
+  rqstUtaId Int
+}
