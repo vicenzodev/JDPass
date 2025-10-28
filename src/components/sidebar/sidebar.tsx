@@ -20,7 +20,7 @@ export default function Sidebar() {
     <motion.aside
       initial={false}
       animate={{ width: open ? 300 : 60 }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.3 }}
       className="fixed left-0 top-0 h-screen flex flex-col bg-green-900 backdrop-blur-lg border-r border-white/10 shadow-[0_0_30px_rgba(0,255,0,0.05)] text-white"
     >
       <div className="flex items-center justify-between p-4 border-b border-white/10">
@@ -42,7 +42,7 @@ export default function Sidebar() {
 
         <button
           onClick={toggleSidebar}
-          className="text-gray-400 hover:text-green-400 transition"
+          className="text-gray-400 hover:text-green-400 transition cursor-pointer"
         >
           <FaChevronRight
             className={`w-5 h-5 transition-transform ${open ? 'rotate-180' : 'rotate-0'}`}
@@ -50,7 +50,6 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {/* resto igual */}
       <nav className="flex-1 overflow-y-auto px-2 py-5">
         {navItems.map((item) => (
           <div key={item.label} className="mb-1">

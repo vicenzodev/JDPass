@@ -19,7 +19,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
       <motion.main
         initial={false}
         animate={{ marginLeft: !isLoginPage ? (sidebarOpen ? 300 : 60) : 0 }}
-        transition={{ duration: 0.2 }}
+        transition={{ duration: 0.3 }}
         className={`flex-1 min-h-screen flex flex-col transition-all ${!isLoginPage ? (sidebarOpen ? "ml-[300px]" : "ml-[60px]") : ""}`}
       >
         {children}

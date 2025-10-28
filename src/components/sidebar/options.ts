@@ -3,7 +3,6 @@ import { TbLayoutDashboard } from "react-icons/tb";
 import { LuFileText, LuKeyRound } from "react-icons/lu";
 import { FaHistory, FaUsers } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
-import { RiLogoutBoxRLine } from "react-icons/ri";
 
 type NavItem = {
   label: string;
@@ -25,7 +24,7 @@ export const navItems: NavItem[] = [
     label: "Gerenciamento de Senhas",
     icon: LuKeyRound,
     children: [
-      { label: "Senhas Ativas", href: "/senhas" },
+      { label: "Senhas Ativas", href: "/senhas/ativas" },
       { label: "Senhas Temporárias", href: "/senhas/temporarias" },
     ],
   },

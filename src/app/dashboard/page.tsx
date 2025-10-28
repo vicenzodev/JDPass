@@ -9,7 +9,7 @@ import SecurityAlerts from "@/components/dashboard/securityAlerts";
 export default function DashboardPage() {
   
   return (
-    <div className="px-8 py-6 min-h-screen">
+    <div className="px-8 py-4 min-h-screen">
       <header className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Painel de Controle</h1>
         <p className="text-gray-500">
