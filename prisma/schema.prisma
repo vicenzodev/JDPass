@@ -14,27 +14,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UTA{
+model Uta{
   id       Int @id @default(autoincrement())
-  user     String
-  email    String
-  password String //hash do bcrypt
+  usuario     String
+  email    String @unique
+  senha    String
   cargo    Int @default(0)
 
-  passwords US[]
+  senhas Us[]
   logs Logs[]
-  reqFeitos Requests[] @relation("PedidosFeitos")
-  reqRecebidos Requests[] @relation("PedidosRecebidos")
 }
 
-model US{
+model Us{
   id          Int @id @default(autoincrement())
-  user        String
-  password    String //A senha criptografada do site
+  usuario        String
+  senhas      String //A senha criptografada do site
   last_change DateTime
   exp_date    DateTime
   
-  uta UTA @relation(fields: [utaId], references: [id])
+  uta Uta @relation(fields: [utaId], references: [id])
   utaId       Int
 }
 
@@ -44,17 +42,6 @@ model Logs{
   status String
   date   DateTime
 
-  uta UTA @relation(fields: [utaId], references: [id])
+  uta Uta @relation(fields: [utaId], references: [id])
   utaId Int
-}
-
-model Requests{
-  id        Int @id @default(autoincrement())
-  status    String
-  date      DateTime
-
-  uta UTA @relation("PedidosFeitos",fields: [utaId], references: [id])
-  utaId     Int
-  rqstUta UTA @relation("PedidosRecebidos",fields: [rqstUtaId], references: [id])
-  rqstUtaId Int
 }

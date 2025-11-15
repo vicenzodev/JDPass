@@ -1,32 +1,72 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/utils/prisma";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 interface IUta{
-    id:number,
-    user:string,
+    usuario:string,
     email:string,
-    password:string,
+    senha:string,
     cargo:number
 }
 
-const prisma = new PrismaClient();
+interface ILogin{
+    usuario?:string,
+    email?:string,
+    senha:string
+}
 
-export const createUta = async (data:IUta): Promise<IUta> =>{
+export const createUta = async (data:IUta): Promise<Omit<IUta, 'senha'>> =>{
     //TODO: validações para a adição de usuários de acesso
-    const uta = await prisma.uta.create({data:data});
+    if(!data.senha) throw new Error("O campo SENHA é obrigatório**");
+
+    const saltRounds = 2;
+    const cSenha = await bcrypt.hash(data.senha,saltRounds);
+    const uta = await prisma.uta.create({
+        data:{
+            ...data,
+            senha:cSenha
+        }
+    });
+
+    const {senha, ...result} = uta;
+    
+    return result;
+}
+
+export const loginUta = async (data:ILogin) =>{
+    const uta = await prisma.uta.findFirst({
+        where: {email: data.email},
+    });
+
+    if(!uta) throw new Error("Credenciais inválidas");
+
+    const isPasswordValid = await bcrypt.compare(data.senha,uta.senha);
+    if(!isPasswordValid) throw new Error("Credenciais inválidas");
+
+    const secret = process.env.JWT_SECRET;
+    if(!secret) throw new Error("A chave secrete JWT (JWT_SECRET não está configurada no .env)");
+
+    const payload = {
+        id:uta.id,
+        email: uta.email,
+    }
+
+    const token = jwt.sign(
+        payload,
+        secret,
+        {expiresIn:'1h'}
+    );
+
+    return {token};
+    /*
+    TODO:
+    Acesso a Rotas Protegidas (Próximo passo):
+    O cliente (frontend) salva esse token (em localStorage ou cookie).
+    Para cada requisição futura (ex: "buscar perfil", "criar post"), o cliente envia o token no cabeçalho (Header): Authorization: Bearer <token_aqui>.
+    Seu backend terá um middleware que usa jwt.verify(token, secret) para checar se o "crachá" é válido e não expirou. Se for, ele permite o acesso à rota.
+    */
+}
+export const deleteUta = async (id:number): Promise<IUta> =>{
+    const uta = await prisma.uta.delete({where:{id:id}});
     return uta;
-}
-
-export const getAllUtas = async (): Promise<IUta[]> =>{
-    const utas = await prisma.uta.findMany();
-    return utas;
-}
-
-export const getUtaById = async (id:number): Promise<IUta[]> =>{
-    const uta = await prisma.uta.findUnique({where:{id: id}});
-    return uta;
-}
-
-export const deleteUta = async (id:number): Promise<IUta[]> =>{
-    const utaToDelete = getUtaById(id);
-    return await prisma.uta.delete({where:{uta:utaToDelete}});
 }

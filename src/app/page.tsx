@@ -16,15 +16,29 @@ export default function LoginPage() {
   const [chave, setChave] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if ((mode === "usuario" && email === "admin@john.deere" && senha === "123456") || (mode === "chave" && chave === "JD-ACCESS-001")) {
-      setLoading(true);
-      router.replace("/dashboard");
-    } else {
-      setError("Credenciais inválidas. Tente novamente.");
+        
+    try {
+        const response = await fetch("/api/login", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, senha, chave}),
+        });
+        const {data, success} = await response.json();
+        if (!data) throw new Error(success ?? "Erro ao buscar condomínios")
+    } catch (e: any) {
+        setError(e.message ?? "Erro inesperado");
+    } finally {
+        setLoading(false);
     }
+
+    // if ((mode === "usuario" && email === "admin@john.deere" && senha === "123456") || (mode === "chave" && chave === "JD-ACCESS-001")) {
+    //   setLoading(true);
+    //   router.replace("/dashboard");
+    // } else {
+    //   setError("Credenciais inválidas. Tente novamente.");
+    // }
   };
 
   return (
