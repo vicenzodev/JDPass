@@ -1,20 +1,25 @@
 import { NextResponse, NextRequest } from "next/server";
 import { loginUta, createUta } from "@/services/uta-service";
+import { cookies } from "next/headers";
 
 export const POST = async (req:NextRequest) => {
     
     try{
         const body = await req.json();
-
-        const token = await loginUta({
+        const {token} = await loginUta({
             email: body.email,
             senha: body.senha
         });
-        
-        return NextResponse.json({
-            message:'Login realizado com sucesso!',
-            token
-        },{status:200});
+
+        (await cookies()).set('session_token',token , {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 60*60*24,
+            path: '/',
+            sameSite: 'lax'
+        });
+
+        return NextResponse.json({message:'Login bem sucedido'},{status:200});
     }catch(e: any){
         return NextResponse.json({
             error: e

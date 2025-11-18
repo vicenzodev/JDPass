@@ -10,8 +10,7 @@ interface IUta{
 }
 
 interface ILogin{
-    usuario?:string,
-    email?:string,
+    email:string,
     senha:string
 }
 
@@ -44,7 +43,7 @@ export const loginUta = async (data:ILogin) =>{
     if(!isPasswordValid) throw new Error("Credenciais inválidas");
 
     const secret = process.env.JWT_SECRET;
-    if(!secret) throw new Error("A chave secrete JWT (JWT_SECRET não está configurada no .env)");
+    if(!secret) throw new Error("A chave secreta JWT_SECRET não está configurada no .env");
 
     const payload = {
         id:uta.id,

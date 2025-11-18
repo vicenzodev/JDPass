@@ -23,22 +23,16 @@ export default function LoginPage() {
         const response = await fetch("/api/login", {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, senha, chave}),
+          body: JSON.stringify({ email:email, senha:senha }),
         });
-        const {data, success} = await response.json();
-        if (!data) throw new Error(success ?? "Erro ao buscar condomínios")
+        if (!response.ok) throw new Error("Usuário ou senha incorretos");
+        setLoading(true);
+        router.replace('/dashboard');
     } catch (e: any) {
-        setError(e.message ?? "Erro inesperado");
+        setError(e.message ?? "Credenciais inválidas. Tente novamente.");
     } finally {
         setLoading(false);
     }
-
-    // if ((mode === "usuario" && email === "admin@john.deere" && senha === "123456") || (mode === "chave" && chave === "JD-ACCESS-001")) {
-    //   setLoading(true);
-    //   router.replace("/dashboard");
-    // } else {
-    //   setError("Credenciais inválidas. Tente novamente.");
-    // }
   };
 
   return (

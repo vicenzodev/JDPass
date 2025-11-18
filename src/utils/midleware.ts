@@ -1,51 +1,25 @@
-import { NextResponse, NextRequest } from "next/server";
-import * as jose from 'jose';
+import { NextRequest, NextResponse } from "next/server";
+import { useRouter } from "next/router";
 
-export const middleware = async (req:NextRequest) =>{
-    const publicRoutes = [
-        '/api/login'
-    ];
+export const middleware = (req:NextRequest) =>{
+    const router = useRouter();
+    const token = req.cookies.get('session_token')?.value;
 
-    const path = req.nextUrl.pathname;
-    if(publicRoutes.includes(path))
-        return NextResponse.next();
+    const {pathname} = req.nextUrl;
 
-    const authHeader = req.headers.get('authorization');
+    //Verificação de rotas públicas
+    const publicRoutes = ['/api/login'];
+    const isProtectedRoute = !publicRoutes.some(route=>pathname.startsWith(route));
 
-    if(!authHeader || !authHeader.startsWith('Bearer ')){
-        return new NextResponse(
-            JSON.stringify({message:'Acesso negado. Token não fornecido ou mal formatado.'}),
-            {status:401,headers:{'Content-Type':'application/json'}}
-        );
-    }
+    //Redirecionamentos
+    if(isProtectedRoute && !token) router.replace('/');
+    if(pathname === '/' && token) router.replace('/dashboard');
 
-    const token = authHeader.split(' ')[1];
-
-    const secret = process.env.JWT_SECRET;
-    if(!secret){
-        console.error("JWT_SECRET não está configurada no .env");
-        return new NextResponse(
-            JSON.stringify({message:'Erro interdo do servidos.'}),
-            {status:500,headers:{'Content-Type':'application/json'}}
-        );
-    }
-
-    try{
-        const secretKey = new TextEncoder().encode(secret);
-        const {payload} = await jose.jwtVerify(token, secretKey);
-        const headers = new Headers(req.headers);
-        headers.set('x-user-id',payload.id as string);
-        headers.set('x-user-email',payload.email as string);
-    
-        return NextResponse.next({request:{headers:headers}});
-    }catch(error){
-        return new NextResponse(
-            JSON.stringify({message:'Token inválido ou expirado.'}),
-            {status:401,headers:{'Content-Type':'application/json'}}
-        );
-    }
+    return NextResponse.next();
 }
 
 export const config = {
-    matcher: '/api/:path*'
-};
+    matcher:[
+        '/((?!_next/static|_next/image|favicon.ico).*)'
+    ]
+}

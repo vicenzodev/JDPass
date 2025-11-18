@@ -7,6 +7,8 @@ import SolicitacoesRecentes from "@/components/dashboard/solicitacoesRecentes";
 import AlertasSeguranca from "@/components/dashboard/alertasSeguranca";
 
 export default function DashboardPage() {
+
+  
   
   return (
     <div className="px-8 py-4 min-h-screen">
