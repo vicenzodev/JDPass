@@ -1,4 +1,4 @@
-import { prisma } from "@/utils/prisma";
+import { prisma } from "../utils/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -32,11 +32,13 @@ export const createUta = async (data:IUta): Promise<Omit<IUta, 'senha'>> =>{
     return result;
 }
 
+export const allUsers = await prisma.uta.findMany();
+
 export const loginUta = async (data:ILogin) =>{
     const uta = await prisma.uta.findFirst({
         where: {email: data.email},
     });
-
+    
     if(!uta) throw new Error("Credenciais inválidas");
 
     const isPasswordValid = await bcrypt.compare(data.senha,uta.senha);
@@ -57,14 +59,8 @@ export const loginUta = async (data:ILogin) =>{
     );
 
     return {token};
-    /*
-    TODO:
-    Acesso a Rotas Protegidas (Próximo passo):
-    O cliente (frontend) salva esse token (em localStorage ou cookie).
-    Para cada requisição futura (ex: "buscar perfil", "criar post"), o cliente envia o token no cabeçalho (Header): Authorization: Bearer <token_aqui>.
-    Seu backend terá um middleware que usa jwt.verify(token, secret) para checar se o "crachá" é válido e não expirou. Se for, ele permite o acesso à rota.
-    */
 }
+
 export const deleteUta = async (id:number): Promise<IUta> =>{
     const uta = await prisma.uta.delete({where:{id:id}});
     return uta;
