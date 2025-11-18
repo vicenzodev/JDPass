@@ -23,6 +23,8 @@ export const AuthProvider = () =>{
             setUser(userData);
         }catch(e:any){
             console.error(e);
+            setUser(null);
+            
         }
     }
 }
