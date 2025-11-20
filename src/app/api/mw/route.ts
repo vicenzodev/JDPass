@@ -8,7 +8,7 @@ export const GET = async () =>{
     if(!token) return NextResponse.json({error: 'Não autorizado'},{status:401});
 
     const secret = process.env.JWT_SECRET;
-    if(!secret) return NextResponse.json({error: 'Chave secrete não configurada'},{status:500});
+    if(!secret) return NextResponse.json({error: 'Chave secreta não configurada'},{status:500});
 
     try{
         const payload = jwt.verify(token, secret) as {id:string; email:string;};

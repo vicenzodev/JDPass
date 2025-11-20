@@ -32,8 +32,6 @@ export const createUta = async (data:IUta): Promise<Omit<IUta, 'senha'>> =>{
     return result;
 }
 
-export const allUsers = await prisma.uta.findMany();
-
 export const loginUta = async (data:ILogin) =>{
     const uta = await prisma.uta.findFirst({
         where: {email: data.email},
@@ -44,9 +42,10 @@ export const loginUta = async (data:ILogin) =>{
     const isPasswordValid = await bcrypt.compare(data.senha,uta.senha);
     if(!isPasswordValid) throw new Error("Credenciais inválidas");
 
+    console.log('teste');
     const secret = process.env.JWT_SECRET;
     if(!secret) throw new Error("A chave secreta JWT_SECRET não está configurada no .env");
-
+    
     const payload = {
         id:uta.id,
         email: uta.email,
