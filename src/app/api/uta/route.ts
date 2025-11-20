@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createUta } from "@/services/uta-service";
+import { createUta, findUtaById } from "@/services/uta-service";
+import { getUserSession } from "@/services/auth";
 
 export const POST = async (req:NextRequest) => {
-    
+    const cargoToCreateUta = 3;
+
     try{
+        const id = await getUserSession();
+        if(!id) throw new Error("Não autorizado");
+        const user = await findUtaById(id.id)
+        
+        if(user.cargo < cargoToCreateUta) throw new Error("Não autorizado :(");
+
         const body = await req.json();
         const uta = await createUta({
             usuario: body.usuario,
@@ -17,9 +25,9 @@ export const POST = async (req:NextRequest) => {
         return NextResponse.json({
             message:'Usuário criado com sucesso!'
         },{status:200});
-    }catch(e: any){
+    }catch(error){
         return NextResponse.json({
-            error: e
+            error
             },{status: 500});
     }
 }

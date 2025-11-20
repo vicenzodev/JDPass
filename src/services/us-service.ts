@@ -1,34 +1,37 @@
-'use client';
-
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/utils/prisma"
+import bcrypt from 'bcrypt';
 
 interface IUs{
-    id:number,
-    user:string,
-    email:string,
-    password:string,
-    cargo:number
+    sistema:string,
+    usuario:string,
+    senhas:string,
+    last_senha:string,
+    last_change:Date,
+    exp_date:Date,
+    obs:string,
+    utaId:number
 }
 
-const prisma = new PrismaClient();
 
-export const createUs = async (data:IUs): Promise<IUs> =>{
-    //TODO: validações para a adição de usuários de acesso
-    const Us = await prisma.Us.create({data:data});
-    return Us;
+export const createUs = async (data:IUs): Promise<Omit<IUs,'senhas'>> =>{
+    if(!data.senhas) throw new Error("O campo SENHA é obrigatório**");
+
+    const saltRounds = 30;
+    const cSenha = await bcrypt.hash(data.senhas,saltRounds);
+    const us = await prisma.us.create({
+        data:{
+            ...data,
+            senhas:cSenha
+        }
+    });
+
+    const {senhas, ...result} = us;
+    
+    return result;
 }
 
-export const getAllUss = async (): Promise<IUs[]> =>{
-    const Uss = await prisma.Us.findMany();
-    return Uss;
-}
-
-export const getUsById = async (id:number): Promise<IUs[]> =>{
-    const Us = await prisma.Us.findUnique({where:{id: id}});
-    return Us;
-}
-
-export const deleteUs = async (id:number): Promise<IUs[]> =>{
-    const UsToDelete = getUsById(id);
-    return await prisma.Us.delete({where:{Us:UsToDelete}});
+export const getUs = async (utaId:number): Promise<IUs[]> =>{
+    const us = await prisma.us.findMany({where:{utaId:utaId}});
+    if(!us) throw new Error("Nenhum usuário de sistema encontrado");
+    return us;
 }

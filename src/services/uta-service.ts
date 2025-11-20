@@ -15,10 +15,9 @@ interface ILogin{
 }
 
 export const createUta = async (data:IUta): Promise<Omit<IUta, 'senha'>> =>{
-    //TODO: validações para a adição de usuários de acesso
     if(!data.senha) throw new Error("O campo SENHA é obrigatório**");
 
-    const saltRounds = 2;
+    const saltRounds = 30;
     const cSenha = await bcrypt.hash(data.senha,saltRounds);
     const uta = await prisma.uta.create({
         data:{
@@ -42,7 +41,6 @@ export const loginUta = async (data:ILogin) =>{
     const isPasswordValid = await bcrypt.compare(data.senha,uta.senha);
     if(!isPasswordValid) throw new Error("Credenciais inválidas");
 
-    console.log('teste');
     const secret = process.env.JWT_SECRET;
     if(!secret) throw new Error("A chave secreta JWT_SECRET não está configurada no .env");
     
@@ -58,6 +56,14 @@ export const loginUta = async (data:ILogin) =>{
     );
 
     return {token};
+}
+
+export const findUtaById = async (id:number) =>{
+    const uta = await prisma.uta.findFirst({where:{id:id}});
+    if(!uta) throw new Error("Usuário não encontrado");
+
+    const {senha, ...result} = uta;
+    return result;
 }
 
 export const deleteUta = async (id:number): Promise<IUta> =>{
