@@ -10,7 +10,7 @@ export default function PageTemplate({ routerBack, title, children }: { routerBa
 
     return (
         <div className="px-8 py-4 min-h-screen">
-            <header className="flex gap-4 items-center justify-content mb-4">
+            <header className="flex gap-4 items-center justify-start mb-4">
                 <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={() => routerBack ? router.replace(routerBack) : router.back()}

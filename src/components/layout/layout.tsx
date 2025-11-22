@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation';
 import Sidebar from '@/components/sidebar/sidebar';
-import HamburgerMenu from '@/components/hamburguerMenu';
 import { ReactNode } from 'react';
 import { LayoutProvider, useLayout } from './layoutContext';
 import { motion } from 'framer-motion';
@@ -24,8 +23,6 @@ function LayoutContent({ children }: { children: ReactNode }) {
       >
         {children}
       </motion.main>
-
-      <HamburgerMenu />
     </div>
   );
 }

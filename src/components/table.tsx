@@ -176,7 +176,7 @@ export default function Table({
           {showAddButton && (
             <motion.button
               whileTap={{ scale: 0.9 }}
-              onClick={() => router.push(`${pathname}/novo`)}
+              onClick={() => router.push(`${pathname}/form`)}
               className="flex items-center gap-2 px-6 h-12 bg-green-800 text-white rounded-md hover:bg-green-900 transition text-base font-medium"
             >
               <FaPlus /> Adicionar

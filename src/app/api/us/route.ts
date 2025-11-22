@@ -40,10 +40,8 @@ export const GET = async () =>{
         const id = await getUserSession();
         if(!id) throw new Error("Faça login para continuar");
 
-        const us = getUs(id.id);
-        return NextResponse.json({
-            us
-        },{status:200});
+        const us = await getUs(id.id);
+        return NextResponse.json(us,{status:200});
     }catch(error){
         return NextResponse.json({
             error

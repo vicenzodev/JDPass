@@ -18,6 +18,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
         
     try {
         const response = await fetch("/api/login", {
@@ -26,7 +27,6 @@ export default function LoginPage() {
           body: JSON.stringify({ email:email, senha:senha }),
         });
         if (!response.ok) throw new Error("Usuário ou senha incorretos");
-        setLoading(true);
         router.replace('/dashboard');
     } catch (e: any) {
         setError(e.message ?? "Credenciais inválidas. Tente novamente.");

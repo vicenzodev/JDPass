@@ -16,7 +16,7 @@ interface IUs{
 export const createUs = async (data:IUs): Promise<Omit<IUs,'senhas'>> =>{
     if(!data.senhas) throw new Error("O campo SENHA é obrigatório**");
 
-    const saltRounds = 30;
+    const saltRounds = 2;
     const cSenha = await bcrypt.hash(data.senhas,saltRounds);
     const us = await prisma.us.create({
         data:{

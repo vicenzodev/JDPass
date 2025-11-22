@@ -17,7 +17,7 @@ interface ILogin{
 export const createUta = async (data:IUta): Promise<Omit<IUta, 'senha'>> =>{
     if(!data.senha) throw new Error("O campo SENHA é obrigatório**");
 
-    const saltRounds = 30;
+    const saltRounds = 2;
     const cSenha = await bcrypt.hash(data.senha,saltRounds);
     const uta = await prisma.uta.create({
         data:{
@@ -56,6 +56,14 @@ export const loginUta = async (data:ILogin) =>{
     );
 
     return {token};
+}
+
+export const listUta = async () => {
+    const uta = await prisma.uta.findMany();
+    if(!uta) throw new Error("Nenhum usuário de sistema encontrado");
+
+    const result = uta.map(({ senha, ...rest }) => rest);
+    return result;
 }
 
 export const findUtaById = async (id:number) =>{

@@ -33,34 +33,23 @@ export const navItems: NavItem[] = [
   {
     label: "Gerenciamento de Senhas",
     icon: LuKeyRound,
-    prefix: "/senhas",
-    children: [
-      { label: "Senhas Ativas", icon: RiLockPasswordFill, href: "/senhas/ativas" },
-      { label: "Senhas Temporárias", icon: MdAccessTime, href: "/senhas/temporarias" },
-    ],
+    href: "/senhas",
   },
   {
-    label: "Solicitações de Acesso",
-    icon: LuFileText,
-  },
-  {
-    label: "Usuários e Perfis",
+    label: "Usuários",
     icon: FaUsers,
     adminOnly: true,
-    prefix: "/admin",
-    children: [
-      { label: "Gerenciar Usuários", icon: FaUser, href: "/admin/usuarios" },
-      { label: "Gerenciar Perfis de Acesso", icon: CgProfile, href: "/admin/perfis" },
-    ],
+    href: "/admin/usuarios",
   },
   {
     label: "Logs / Auditoria",
     icon: FaHistory,
     adminOnly: true,
+    href: '/admin/logs'
   },
   {
     label: "Configurações",
     icon: IoMdSettings,
-    adminOnly: true,
+    href: '/configuracoes'
   },
 ];

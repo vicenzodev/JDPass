@@ -1,7 +1,8 @@
-export function formatDate(dateString: string): string {
-  if (!dateString) return "";
+export function formatDate(dateInput?: string | Date | null): string {
+  if (!dateInput) return "";
 
-  const date = new Date(dateString);
+  const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+  if (isNaN(date.getTime())) return ""; // caso a data seja inválida
 
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");

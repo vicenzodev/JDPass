@@ -68,7 +68,7 @@ export default function Sidebar() {
 
       <nav className="flex-1 overflow-y-auto px-2 py-5">
         {navItems.map((item) => (
-          <div key={item.label} className="mb-1">
+          <div key={item.label} className="mb-2">
             {item.children ? (
               <>
                 <button
@@ -100,14 +100,14 @@ export default function Sidebar() {
                         <Link
                           key={child.label}
                           href={child.href}
-                          className={`flex items-center text-sm text-gray-200
-                            px-3 py-2 mt-1 rounded-lg hover:bg-white/10 hover:text-green-300 transition
+                          className={`flex items-center text-md text-gray-200
+                            px-3 py-3 mt-2 rounded-lg hover:bg-white/10 hover:text-green-300 transition
                             ${open ? 'gap-3' : ''} ${
                               pathname === child.href ? 'bg-white/10 text-green-300' : ''
                             }`}
                           title={child.label}
                         >
-                          <child.icon size={20} className="text-green-400 min-w-[22px]" />
+                          <child.icon size={22} className="text-green-400 min-w-[22px]" />
                           {open && <span>{child.label}</span>}
                         </Link>
                       ))}
@@ -118,8 +118,8 @@ export default function Sidebar() {
             ) : (
               <Link
                 href={item.href ?? '#'}
-                className={`flex items-center gap-3 text-md font-medium 
-                px-3 py-2 rounded-lg hover:bg-white/10 hover:text-green-300 transition
+                className={`flex items-center gap-3 text-base font-medium 
+                px-3 py-2.5 rounded-lg hover:bg-white/10 hover:text-green-300 transition
                 ${pathname === item.href ? 'bg-white/20 text-green-300' : ''}`}
                 title={item.label}
               >
@@ -129,11 +129,11 @@ export default function Sidebar() {
             )}
           </div>
         ))}
-        <hr className="my-3 text-gray-400" />
+        <hr className="my-4 text-gray-400" />
         <Link
           href="/"
-          className="flex items-center gap-3 text-md font-medium 
-          px-3 py-2 rounded-lg hover:bg-white/10 hover:text-green-300 transition"
+          className="flex items-center gap-3 text-base font-medium 
+          px-3 py-2.5 rounded-lg hover:bg-white/10 hover:text-green-300 transition"
         >
           <RiLogoutBoxRLine size={22} className="text-green-400" />
           {open && <span>Log out</span>}

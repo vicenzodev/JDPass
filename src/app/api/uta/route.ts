@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createUta, findUtaById } from "@/services/uta-service";
+import { createUta, findUtaById, listUta } from "@/services/uta-service";
 import { getUserSession } from "@/services/auth";
 
 export const POST = async (req:NextRequest) => {
@@ -29,5 +29,19 @@ export const POST = async (req:NextRequest) => {
         return NextResponse.json({
             error
             },{status: 500});
+    }
+}
+
+export const GET = async () =>{
+    try{
+        const id = await getUserSession();
+        if(!id) throw new Error("Faça login para continuar");
+
+        const uta = await listUta();
+        return NextResponse.json(uta,{status:200});
+    }catch(error){
+        return NextResponse.json({
+            error
+        },{status: 500});
     }
 }
