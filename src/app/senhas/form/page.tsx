@@ -63,6 +63,7 @@ export default function SenhaAtivaForm() {
           last_senha: formData.last_senha,
           last_change: new Date().toISOString(),
           exp_date: formData.exp_date,
+          ambiente: formData.ambiente,
           obs: formData.obs,
           uta_id: utaId.id,
         }),
@@ -195,10 +196,10 @@ export default function SenhaAtivaForm() {
                   className="w-full h-12 px-4 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-800 text-gray-700 cursor-pointer"
                 >
                   <option value="">Selecione...</option>
-                  <option value="prod">Prod</option>
-                  <option value="hml">Hml</option>
-                  <option value="teste">Teste</option>
-                  <option value="dev">Dev</option>
+                  <option value="PROD">PROD</option>
+                  <option value="HML">HML</option>
+                  <option value="TESTE">TESTE</option>
+                  <option value="DEV">DEV</option>
                 </select>
               </InputWrapper>
             </div>

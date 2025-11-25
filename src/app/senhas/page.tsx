@@ -15,6 +15,7 @@ type Senha = {
   last_senha: string;
   last_change: Date;
   exp_date: Date;
+  ambiente: string;
   obs: string;
   utaId: number;
 };
@@ -48,6 +49,7 @@ export default function ListarSenhasPage() {
     return senhas.map((item) => ({
       sistema: item.sistema,
       usuario: item.usuario,
+      ambiente: item.ambiente,
       lastChange: formatDate(item.last_change),
       expDate: formatDate(item.exp_date),
       actions: (
