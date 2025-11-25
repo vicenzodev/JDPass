@@ -19,6 +19,7 @@ export const POST = async (req:NextRequest) => {
             last_senha:'',
             last_change:last_change,
             exp_date:exp_date,
+            ambiente:body.ambiente,
             obs:body.obs,
             utaId:id.id
         });
