@@ -1,6 +1,5 @@
+import { criptografarSenha } from "@/utils/crypto";
 import { prisma } from "@/utils/prisma"
-import bcrypt from 'bcrypt';
-
 interface IUs{
     sistema:string,
     usuario:string,
@@ -17,8 +16,7 @@ interface IUs{
 export const createUs = async (data:IUs): Promise<Omit<IUs,'senhas'>> =>{
     if(!data.senhas) throw new Error("O campo SENHA é obrigatório**");
 
-    const saltRounds = 2;
-    const cSenha = await bcrypt.hash(data.senhas,saltRounds);
+    const cSenha = await criptografarSenha(data.senhas);
     const us = await prisma.us.create({
         data:{
             ...data,
