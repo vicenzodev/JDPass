@@ -32,6 +32,7 @@ model Us{
   last_senha  String
   last_change DateTime
   exp_date    DateTime
+  ambiente    String
   obs         String
   
   uta Uta @relation(fields: [utaId], references: [id])

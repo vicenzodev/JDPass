@@ -8,6 +8,7 @@ interface IUs{
     last_senha:string,
     last_change:Date,
     exp_date:Date,
+    ambiente:string,
     obs:string,
     utaId:number
 }
