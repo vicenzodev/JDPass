@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createUta, findUtaById, listUta } from "@/services/uta-service";
+import { createUta, deleteUta, findUtaById, listUta, updateUta } from "@/services/uta-service";
 import { getUserSession } from "@/services/auth";
 
 export const POST = async (req:NextRequest) => {
@@ -32,16 +32,72 @@ export const POST = async (req:NextRequest) => {
     }
 }
 
-export const GET = async () =>{
-    try{
-        const id = await getUserSession();
-        if(!id) throw new Error("Faça login para continuar");
+export const GET = async (req: NextRequest) => {
+  try {
+    const session = await getUserSession();
+    if (!session) throw new Error("Faça login para continuar");
 
-        const uta = await listUta();
-        return NextResponse.json(uta,{status:200});
-    }catch(error){
-        return NextResponse.json({
-            error
-        },{status: 500});
+    const id = Number(req.nextUrl.searchParams.get("id"));
+
+    if (id) {
+      const uta = await findUtaById(id);
+      if (!uta) throw new Error("Usuário não encontrado");
+      return NextResponse.json(uta, { status: 200 });
     }
-}
+
+    const utaList = await listUta();
+    return NextResponse.json(utaList, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
+  }
+};
+
+export const PATCH = async (req: NextRequest) => {
+  const cargoToUpdateUta = 3;
+
+  try {
+    const session = await getUserSession();
+    if (!session) throw new Error("Não autorizado");
+
+    const requester = await findUtaById(session.id);
+    if (requester.cargo < cargoToUpdateUta)
+      throw new Error("Não autorizado :(");
+
+    const id = Number(req.nextUrl.searchParams.get("id"));
+    if (!id) throw new Error("ID não informado");
+
+    const body = await req.json();
+
+    const updated = await updateUta(id, {
+      usuario: body.usuario,
+      email: body.email,
+      senha: body.senha,
+      cargo: body.cargo
+    });
+
+    if (!updated) throw new Error("Não foi possível atualizar o usuário");
+
+    return NextResponse.json(
+      { message: "Usuário atualizado com sucesso!" },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
+  }
+};
+
+export const DELETE = async (req: NextRequest) => {
+  try {
+    const session = await getUserSession();
+    if (!session) throw new Error("Faça login");
+
+    const id = Number(req.nextUrl.searchParams.get("id"));
+    if (!id) throw new Error("ID é obrigatório");
+
+    await deleteUta(id);
+
+    return NextResponse.json({ message: "Removido com sucesso" });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+};

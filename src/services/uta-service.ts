@@ -74,6 +74,29 @@ export const findUtaById = async (id:number) =>{
     return result;
 }
 
+export const updateUta = async (id: number, data: Partial<IUta>) => {
+    const uta = await prisma.uta.findFirst({ where: { id } });
+    if (!uta) throw new Error("Usuário não encontrado");
+
+    let newData = { ...data };
+
+    if (data.senha) {
+        const saltRounds = 2;
+        const cSenha = await bcrypt.hash(data.senha, saltRounds);
+        newData.senha = cSenha;
+    } else {
+        delete newData.senha;
+    }
+
+    const updated = await prisma.uta.update({
+        where: { id },
+        data: newData,
+    });
+    const { senha, ...result } = updated;
+    return result;
+};
+
+
 export const deleteUta = async (id:number): Promise<IUta> =>{
     const uta = await prisma.uta.delete({where:{id:id}});
     return uta;

@@ -6,8 +6,12 @@ import DataTable from "@/components/table";
 import { MdEdit } from "react-icons/md";
 import { BiTrash } from "react-icons/bi";
 import { columns } from "./options";
+import ConfirmDialog from "@/components/confirmDialog";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 type Usuario = {
+  id: string;
   usuario: string;
   email: string;
   cargo: number;
@@ -16,6 +20,8 @@ type Usuario = {
 export default function ListarSenhasPage() {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<Usuario[]>();
+
+  const router = useRouter();
 
   const getUsers = async () => {
      setLoading(true);
@@ -36,6 +42,22 @@ export default function ListarSenhasPage() {
     getUsers();
   }, []);
 
+  const handleDelete = async (id: string) => {
+      try {
+        const res = await fetch(`/api/uta?id=${id}`, {
+          method: "DELETE",
+        });
+  
+        if (!res.ok) throw new Error("Erro ao excluir usuário");
+  
+        setUsers((prev) => prev?.filter((s) => s.id !== id));
+        
+        toast.success("Usuário excluído com sucesso!");
+      } catch (err) {
+        toast.error("Erro ao excluir o usuário");
+      }
+    };
+
   const getTableData = () => {
     if (!users?.length) return [];
 
@@ -45,12 +67,19 @@ export default function ListarSenhasPage() {
       cargo: item.cargo,
       actions: (
         <span className="flex justify-center gap-4">
-          <button title="Editar">
+          <button title="Editar" onClick={() => router.push(`/admin/usuarios/form?id=${item.id}`)}>
             <MdEdit size={18} />
           </button>
-          <button title="Excluir">
-            <BiTrash size={18} />
-          </button>
+          <ConfirmDialog
+            trigger={
+              <button title="Excluir">
+                <BiTrash size={18} />
+              </button>
+            }
+            title="Excluir Usuário?"
+            description="Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita."
+            onConfirm={() => handleDelete(item.id)}
+          />
         </span>
       ),
     }));

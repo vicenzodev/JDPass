@@ -3,7 +3,7 @@
 import { InputWrapper } from "@/components/inputWrapper";
 import PageTemplate from "@/components/pageTemplate";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import {
@@ -15,26 +15,15 @@ import {
   BiX,
 } from "react-icons/bi";
 import { PiMonitor } from "react-icons/pi";
+import { toast } from "react-toastify";
 
 export default function SenhaAtivaForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showLastPassword, setShowLastPassword] = useState(false);
-  const [utaId, setUtaId] = useState({ id: '', email: '' });
   const router = useRouter();
-
-  useEffect(() => {
-    const getResponse = async () => {
-        const response = await fetch("/api/mw", {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-        });
-        setUtaId(await response.json());
-    }
-    
-    getResponse();
-  }, []);
-  
+  const searchParams = useSearchParams();
+  const editingId = searchParams.get("id");
 
   const [formData, setFormData] = useState({
     sistema: "",
@@ -42,10 +31,37 @@ export default function SenhaAtivaForm() {
     senhas: "",
     ambiente: "",
     last_senha: "",
-    last_change: "",
     exp_date: "",
     obs: "",
   });
+
+  useEffect(() => {
+    if (!editingId) return;
+
+   const loadData = async () => {
+      try {
+        const response = await fetch(`/api/us?id=${editingId}`);
+        if (!response.ok) throw new Error("Erro ao carregar dados");
+
+        const data = await response.json();
+
+        setFormData({
+          sistema: data.sistema || "",
+          usuario: data.usuario || "",
+          senhas: data.senhas || "",
+          ambiente: data.ambiente || "",
+          last_senha: data.last_senha || "",
+          exp_date: data.exp_date?.substring(0, 10) || "",
+          obs: data.obs || "",
+        });
+      } catch (err) {
+        toast.error("Erro ao carregar dados da senha.");
+      }
+    };
+
+    loadData();
+  }, [editingId]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,43 +69,36 @@ export default function SenhaAtivaForm() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/us", {
-        method: "POST",
+      const { last_senha, ...dataToSend } = formData;
+
+      const response = await fetch(`/api/us${editingId ? `?id=${editingId}` : ""}`, {
+        method: editingId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sistema: formData.sistema,
-          usuario: formData.usuario,
-          senhas: formData.senhas,
-          last_senha: formData.last_senha,
-          last_change: new Date().toISOString(),
-          exp_date: formData.exp_date,
-          ambiente: formData.ambiente,
-          obs: formData.obs,
-          uta_id: utaId.id,
+          ...dataToSend,
+          exp_date: new Date(formData.exp_date),
         }),
       });
 
       if (!response.ok) throw new Error("Erro ao salvar");
 
+      toast.success(editingId ? "Senha atualizada com sucesso!" : "Senha cadastrada com sucesso!");
+
       router.back();
     } catch (error) {
-      console.error("Erro ao salvar:", error);
+      toast.error("Ocorreu um erro ao salvar a senha.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
-    <PageTemplate title="Cadastrar Senha Ativa" routerBack="/senhas">
+    <PageTemplate title={editingId ? "Editar Senha" : "Cadastrar Senha"} routerBack="/senhas">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -203,19 +212,6 @@ export default function SenhaAtivaForm() {
                 </select>
               </InputWrapper>
             </div>
-          </div>
-
-          <div className="mb-8">
-            <InputWrapper
-              label="Última Alteração"
-              icon={<BiCalendar size={16} />}
-            >
-              <div className="w-full h-12 px-4 bg-gray-200 border border-gray-300 rounded-lg flex items-center text-gray-700 italic select-none">
-                {formData.last_change
-                  ? new Date(formData.last_change).toLocaleString("pt-BR")
-                  : 'Será definido como "Agora" ao salvar'}
-              </div>
-            </InputWrapper>
           </div>
 
           <div className="mb-8">
