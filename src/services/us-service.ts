@@ -40,11 +40,45 @@ export const getUs = async (utaId:number) =>{
     return usNoPassword;
 }
 
+export const getUsById = async (id: number, utaId: number) => {
+    const us = await prisma.us.findFirst({
+        where: { id, utaId }
+    });
+
+    if (!us) return null;
+
+    const senha = us.senhas ? await descriptografarSenha(us.senhas) : "";
+
+    const lastSenha = us.last_senha ? await descriptografarSenha(us.last_senha) : "";
+
+    return {
+        ...us,
+        senhas: senha,
+        last_senha: lastSenha,
+    };
+};
+
 export const getUsSenha = async (utaId:number,usId:number)=>{
     const us = await prisma.us.findFirst({where:{id:usId,utaId:utaId}});
     if(!us) return '';
     const senha = await descriptografarSenha(us.senhas);
     return senha;
+}
+
+export const updateUs = async (usId: number, data:IUs) => {
+    const cSenha = await criptografarSenha(data.senhas);
+    const lSenha = await criptografarSenha(data.last_senha);
+    const us = await prisma.us.update({
+        where: {
+            id: usId,
+        },
+        data: {
+            ...data,
+            senhas: cSenha,
+            last_senha: lSenha,
+        }
+    })
+    return us;
 }
 
 export const updateUsSenha = async (utaId:number,usId:number,senha:string,lastSenha:string) =>{
@@ -72,5 +106,11 @@ export const verifyExpDate = async () =>{
         }
     });
     if(!us) throw new Error("Nenhum usuário de sistema encontrado :(");
+    return us;
+}
+
+export const deleteUs = async (id: number) => {
+    const us = prisma.us.delete({ where: { id } });
+
     return us;
 }

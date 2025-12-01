@@ -5,6 +5,7 @@ import Sidebar from '@/components/sidebar/sidebar';
 import { ReactNode } from 'react';
 import { LayoutProvider, useLayout } from './layoutContext';
 import { motion } from 'framer-motion';
+import { ToastContainer } from 'react-toastify';
 
 function LayoutContent({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -22,6 +23,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
         className={`flex-1 min-h-screen flex flex-col transition-all ${!isLoginPage ? (sidebarOpen ? "ml-[300px]" : "ml-[80px]") : ""}`}
       >
         {children}
+        <ToastContainer position="top-right" autoClose={3000} />
       </motion.main>
     </div>
   );
