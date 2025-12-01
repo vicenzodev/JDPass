@@ -1,32 +1,23 @@
-import { PrismaClient } from '../generated/prisma/client';
+import { prisma } from "@/utils/prisma";
 
-interface ILogs{
-    id:number,
-    Logser:string,
-    email:string,
-    password:string,
-    cargo:number
+interface Ilogs{
+    event:string,
+    status:string,
+    date: Date,
+    utaId:number
 }
 
-const prisma = new PrismaClient();
-
-export const createLogs = async (data:ILogs): Promise<ILogs> =>{
-    //TODO: validações para a adição de Logsuários de acesso
-    const Logs = await prisma.Logs.create({data:data});
-    return Logs;
+export const createLog = async (data:Ilogs): Promise<Ilogs> =>{
+    const logs = await prisma.logs.create({data:data});
+    return logs;
 }
 
-export const getAllLogss = async (): Promise<ILogs[]> =>{
-    const Logs = await prisma.Logs.findMany();
-    return Logs;
+export const getAllLogs = async (): Promise<Ilogs[]> =>{
+    const logs = await prisma.logs.findMany();
+    return logs;
 }
 
-export const getLogsById = async (id:number): Promise<ILogs[]> =>{
-    const Logs = await prisma.Logs.findUnique({where:{id: id}});
-    return Logs;
-}
-
-export const deleteLogs = async (id:number): Promise<ILogs[]> =>{
-    const LogsToDelete = getLogsById(id);
-    return await prisma.Logs.delete({where:{Logs:LogsToDelete}});
+export const getLogById = async (id:number) =>{
+    const log = await prisma.logs.findUnique({where:{id: id}});
+    return log;
 }

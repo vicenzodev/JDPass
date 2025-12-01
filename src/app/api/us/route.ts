@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserSession } from "@/services/auth";
-import { createUs, getUs } from "@/services/us-service";
+import { createUs, getUs, getUsSenha } from "@/services/us-service";
+import { createLog } from "@/services/logs-service";
 
 export const POST = async (req:NextRequest) => {
 
@@ -26,24 +27,47 @@ export const POST = async (req:NextRequest) => {
 
         if(!us) throw new Error("Não foi possível criar o usuário");
 
+        createLog({
+            event: "Usuário criado com sucesso!",
+            status:"200",
+            date:new Date(),
+            utaId: id.id
+        });
+
         return NextResponse.json({
             message:'Usuário criado com sucesso!'
         },{status:200});
     }catch(error){
+        createLog({
+            event: JSON.stringify(error),
+            status:"500",
+            date:new Date(),
+            utaId: 0
+        });
+
         return NextResponse.json({
             error
         },{status: 500});
     }
 }
 
-export const GET = async () =>{
+export const GET = async (req:NextRequest) =>{
     try{
         const id = await getUserSession();
         if(!id) throw new Error("Faça login para continuar");
+        const body = await req.json();
 
         const us = await getUs(id.id);
-        return NextResponse.json(us,{status:200});
+        const senha = await getUsSenha(id.id,body.id);
+        return NextResponse.json({us:us,senha:senha},{status:200});
     }catch(error){
+        createLog({
+            event: JSON.stringify(error),
+            status:"500",
+            date:new Date(),
+            utaId: 0
+        });
+
         return NextResponse.json({
             error
         },{status: 500});

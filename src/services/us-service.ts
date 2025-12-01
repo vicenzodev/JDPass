@@ -48,6 +48,8 @@ export const getUsSenha = async (utaId:number,usId:number)=>{
 }
 
 export const updateUsSenha = async (utaId:number,usId:number,senha:string,lastSenha:string) =>{
+    let newExpDate = new Date();
+    newExpDate.setMonth(newExpDate.getMonth()+1);
     const us = await prisma.us.update({
         where:{
             id:usId,
@@ -55,7 +57,9 @@ export const updateUsSenha = async (utaId:number,usId:number,senha:string,lastSe
         },
         data:{
             senhas: criptografarSenha(senha),
-            last_senha: criptografarSenha(lastSenha)
+            last_senha: criptografarSenha(lastSenha),
+            exp_date: newExpDate,
+            last_change: new Date()
         }
     });
     return us;

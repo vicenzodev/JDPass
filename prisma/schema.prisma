@@ -39,7 +39,6 @@ model Us{
   utaId       Int
 }
 
-
 model Logs{
   id     Int @id @default(autoincrement())
   event  String
