@@ -40,7 +40,7 @@ export const getUs = async (utaCargo: number) => {
         }
     });
 
-    if (!us || us.length === 0) {
+    if (!us) {
         throw new Error("Nenhum usuário de sistema encontrado :(");
     }
 

@@ -184,7 +184,11 @@ html[data-font-size="3"] {
     color: var(--foreground);
   }
   .btn-secondary:hover {
-    @apply bg-gray-100 dark:bg-gray-800;
+    @apply bg-gray-100;
+  }
+
+  :root.dark .btn-secondary:hover {
+    background-color: #374151;
   }
 
   .bg-select {

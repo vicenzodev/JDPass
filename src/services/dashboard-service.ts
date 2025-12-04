@@ -2,8 +2,12 @@ import { IDashboardData } from "@/app/dashboard/type";
 import { prisma } from "@/utils/prisma";
 
 export const getDashboardData = async (userId: number, cargo: number): Promise<IDashboardData> => {
-    const isManagement = cargo >= 2;
-    const globalFilter = isManagement ? {} : { utaId: userId };
+    const globalFilter = {
+        uta: {
+            cargo: { lte: cargo }
+        }
+    };
+
     const hoje = new Date();
     const proximaSemana = new Date(hoje);
     proximaSemana.setDate(hoje.getDate() + 7);
@@ -53,21 +57,26 @@ export const getDashboardData = async (userId: number, cargo: number): Promise<I
         })
     ]);
 
+    const getBrazilDateKey = (date: Date) => {
+        return date.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+    };
+
     const mapaSemanal = new Map<string, number>();
-    const diasParaGrafico = [];
 
     for (let i = 6; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
-        const key = d.toISOString().split('T')[0]; 
+        const key = getBrazilDateKey(d); 
         mapaSemanal.set(key, 0);
     }
 
     rawSenhasSemana.forEach(item => {
-        const key = new Date(item.last_change).toISOString().split('T')[0];
-        
-        if (mapaSemanal.has(key)) {
-            mapaSemanal.set(key, (mapaSemanal.get(key) || 0) + 1);
+        if (item.last_change) {
+            const key = getBrazilDateKey(new Date(item.last_change));
+            
+            if (mapaSemanal.has(key)) {
+                mapaSemanal.set(key, (mapaSemanal.get(key) || 0) + 1);
+            }
         }
     });
 

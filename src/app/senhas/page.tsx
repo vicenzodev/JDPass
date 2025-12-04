@@ -169,7 +169,7 @@ export default function ListarSenhasPage() {
         filterOptions={[
           { label: "Sistema", value: "sistema", type: "text" },
           { label: "Usuário", value: "usuario", type: "text" },
-          { label: "Cargo", value: "cargo", type: "select", options: [
+          { label: "Ambiente", value: "ambiente", type: "select", options: [
             { label: "DEV", value: "DEV" },
             { label: "TESTE", value: "TESTE" },
             { label: "HML", value: "HML" },

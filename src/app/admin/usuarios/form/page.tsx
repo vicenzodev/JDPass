@@ -46,7 +46,7 @@ export default function UsuariosForm() {
           usuario: data.usuario || "",
           email: data.email || "",
           senha: "",
-          cargo: String(data.cargo || ""),
+          cargo: String(data.cargo ?? ""),
         });
       } catch (err) {
         toast.error("Erro ao carregar dados do usuário.");
@@ -116,86 +116,90 @@ export default function UsuariosForm() {
       >
         <form onSubmit={handleSubmit} className="p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="space-y-6">
-              <InputWrapper
-                label="Nome do Usuário"
-                icon={<BiUser size={16} />}
-                required={true}
-              >
-                <input
-                  required
-                  type="text"
-                  name="usuario"
-                  value={formData.usuario}
-                  onChange={handleChange}
-                  placeholder="Ex: João Silva"
-                  className="input-base w-full rounded-lg px-4 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent"
-                />
-              </InputWrapper>
+            <InputWrapper
+              label="Nome do Usuário"
+              icon={<BiUser size={16} />}
+              required={true}
+            >
+              <input
+                required
+                type="text"
+                name="usuario"
+                value={formData.usuario}
+                onChange={handleChange}
+                placeholder="Ex: João Silva"
+                className="input-base w-full rounded-lg px-4 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent"
+              />
+            </InputWrapper>
 
-              <InputWrapper
-                label="E-mail / Login"
-                icon={<MdOutlineEmail size={16} />}
-                required={true}
+            <InputWrapper
+              label="Cargo"
+              icon={<FaSuitcase size={14} />}
+              required={true}
+            >
+              <select
+                required
+                name="cargo"
+                value={formData.cargo}
+                onChange={handleChange}
+                className="input-base w-full rounded-lg px-4 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent cursor-pointer"
               >
-                <input
-                  required
-                  type="text"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="joao.silva"
-                  className="input-base w-full rounded-lg px-4 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent"
-                />
-              </InputWrapper>
-            </div>
+                <option value="">Selecione...</option>
+                <option value="0">Operacional</option>
+                <option value="1">Supervisor</option>
+                <option value="2">Gestor</option>
+                <option value="3">Gerente</option>
+              </select>
+            </InputWrapper>
 
-            <div className="space-y-6">
-              <InputWrapper
-                label="Cargo"
-                icon={<FaSuitcase size={14} />}
-                required={true}
-              >
-                <select
-                  required
-                  name="cargo"
-                  value={formData.cargo}
+            <InputWrapper
+              label="E-mail / Login"
+              icon={<MdOutlineEmail size={16} />}
+              required={true}
+            >
+              <input
+                required
+                type="text"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="joao.silva"
+                className="input-base w-full rounded-lg px-4 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent"
+              />
+            </InputWrapper>
+
+            <InputWrapper
+              label="Senha"
+              icon={<BiKey size={16} />}
+              required={!editingId}
+            >
+              <div className="relative">
+                <input
+                  required={!editingId}
+                  type={showPassword ? "text" : "password"}
+                  name="senha"
+                  value={formData.senha}
                   onChange={handleChange}
-                  className="input-base w-full rounded-lg px-4 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent cursor-pointer"
+                  placeholder={
+                    editingId
+                      ? "Deixe em branco para manter a mesma senha"
+                      : "************"
+                  }
+                  className="input-base w-full rounded-lg px-4 pr-12 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3.5 text-foreground/50 hover:text-[var(--brand-color)] transition-colors"
                 >
-                  <option value="">Selecione...</option>
-                  <option value="0">Operacional</option>
-                  <option value="1">Supervisor</option>
-                  <option value="2">Gestor</option>
-                  <option value="3">Gerente</option>
-                </select>
-              </InputWrapper>
-
-              <InputWrapper
-                label="Senha"
-                icon={<BiKey size={16} />}
-                required={!editingId}
-              >
-                <div className="relative">
-                  <input
-                    required={!editingId}
-                    type={showPassword ? "text" : "password"}
-                    name="senha"
-                    value={formData.senha}
-                    onChange={handleChange}
-                    placeholder={editingId ? "Deixe em branco para manter a mesma senha" : "************"}
-                    className="input-base w-full rounded-lg px-4 pr-12 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3.5 text-foreground/50 hover:text-[var(--brand-color)] transition-colors"
-                  >
-                    {showPassword ? <AiFillEyeInvisible size={20} /> : <AiFillEye size={20} />}
-                  </button>
-                </div>
-              </InputWrapper>
-            </div>
+                  {showPassword ? (
+                    <AiFillEyeInvisible size={20} />
+                  ) : (
+                    <AiFillEye size={20} />
+                  )}
+                </button>
+              </div>
+            </InputWrapper>
           </div>
 
           <div className="flex flex-col-reverse md:flex-row items-center justify-end gap-4 pt-6 border-t border-border">

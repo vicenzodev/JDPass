@@ -90,7 +90,7 @@ export default function ListarLogsPage() {
             { label: "Alerta", value: "Alerta" },
             { label: "Erro", value: "Erro" },
           ] },
-          { label: "Usuário", value: "usuario", type: "text" },
+          { label: "Usuário", value: "user", type: "text" },
         ]}
         extraButtons={[
           {
