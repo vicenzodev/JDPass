@@ -24,7 +24,7 @@ export const POST = async (req:NextRequest) => {
         if(!uta) throw new Error("Não foi possível criar o usuário");
 
         createLog({
-            event: "Usuário criado com sucesso!",
+            event: "Usuário criado com sucesso",
             status:"200",
             date:new Date(),
             utaId: id.id
@@ -67,7 +67,7 @@ export const GET = async (req: NextRequest) => {
       return NextResponse.json(uta, { status: 200 });
     }
 
-    const utaList = await listUta();
+    const utaList = await listUta(session.id);
     return NextResponse.json(utaList, { status: 200 });
   } catch (error) {
     createLog({
@@ -137,7 +137,7 @@ export const DELETE = async (req: NextRequest) => {
     await deleteUta(id);
 
     createLog({
-        event: "Removido com sucesso",
+        event: "Usuário removido com sucesso",
         status:"200",
         date:new Date(),
         utaId: session.id

@@ -1,15 +1,25 @@
-export function formatDate(dateInput?: string | Date | null): string {
+export function formatDate(dateInput?: string | Date | null, withHours?: boolean): string {
   if (!dateInput) return "";
 
   const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
-  if (isNaN(date.getTime())) return ""; // caso a data seja inválida
+  if (isNaN(date.getTime())) return "";
 
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
 
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const formattedDate = `${day}/${month}/${year}`;
 
-  return `${day}/${month}/${year} ${hours}:${minutes}`;
+  if (withHours) {
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${formattedDate} ${hours}:${minutes}`;
+  }
+
+  return formattedDate;
+}
+
+export function parseLocalDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
 }

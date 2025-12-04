@@ -13,12 +13,23 @@ import {
 import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { ColumnProps, FilterOption } from "@/utils/table";
+import ConfirmDialog from "./confirmDialog";
+
+interface ConfirmationConfig {
+  title: string;
+  description: string;
+  variant?: 'danger' | 'primary' | 'success' | 'neutral';
+  icon?: ReactNode;
+  confirmLabel?: string;
+  cancelLabel?: string;
+}
 
 interface ActionButton {
   label: string;
   icon?: ReactNode;
   onClick: () => void;
   variant?: "default" | "outlined";
+  confirmation?: ConfirmationConfig;
 }
 
 interface DataTableProps {
@@ -32,6 +43,12 @@ interface DataTableProps {
   showAddButton?: boolean;
   onAddClick?: () => void;
   extraButtons?: ActionButton[];
+  manualPagination?: boolean;
+  totalRecords?: number;
+  page?: number;
+  perPage?: number;
+  onPageChange?: (page: number) => void;
+  onPerRowsChange?: (newPerPage: number) => void;
 }
 
 export default function Table({
@@ -79,13 +96,14 @@ export default function Table({
   const endItem = Math.min(currentPage * itemsPerPage, filteredData.length);
 
   return (
-    <div className="w-full bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-6">
+    <div className="w-full bg-card/80 backdrop-blur-lg rounded-2xl shadow-md p-6 border border-border transition-colors duration-300">
+      
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-2">
           {filterable && filterOptions && (
-            <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+            <div className="flex items-center rounded-lg overflow-hidden border border-border">
               <select
-                className="px-3 h-12 bg-gray-200 focus:outline-none focus:ring-2 focus:ring-green-800"
+                className="px-3 h-12 bg-select text-foreground focus:outline-none border-r border-border"
                 value={filterField}
                 onChange={(e) => setFilterField(e.target.value)}
               >
@@ -98,7 +116,7 @@ export default function Table({
 
               {filterOptions.find(f => f.value === filterField)?.type === "select" ? (
                 <select
-                  className="pl-4 pr-4 h-12 w-60 md:w-64 border-l border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-green-800"
+                  className="pl-4 pr-4 h-12 w-60 md:w-64 bg-card text-foreground focus:outline-none"
                   value={filterValue}
                   onChange={(e) => {
                     setFilterValue(e.target.value);
@@ -108,14 +126,14 @@ export default function Table({
                   <option value="">Todos</option>
                   {filterOptions
                     .find(f => f.value === filterField)?.options?.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
                       </option>
                     ))}
                 </select>
               ) : (
-                <div className="relative flex-1">
-                  <FaSearch className="absolute left-3 top-3.5 text-gray-400" />
+                <div className="relative flex-1 bg-card">
+                  <FaSearch className="absolute left-3 top-3.5 text-foreground/40" />
                   <input
                     type="text"
                     value={filterValue}
@@ -124,7 +142,7 @@ export default function Table({
                       setCurrentPage(1);
                     }}
                     placeholder={filterPlaceholder}
-                    className="pl-10 pr-4 h-12 w-60 md:w-64 border-l border-gray-300 bg-white focus:outline-none"
+                    className="pl-10 pr-4 h-12 w-60 md:w-64 bg-card text-foreground focus:outline-none placeholder:text-foreground/30"
                   />
                 </div>
               )}
@@ -135,49 +153,64 @@ export default function Table({
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={onRefresh}
-              className="p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-200 transition"
+              className="p-4 btn-secondary"
               title="Recarregar tabela"
             >
-              <FaSyncAlt size={18} className="text-gray-900" />
+              <FaSyncAlt size={18} />
             </motion.button>
           )}
 
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => setCardMode((prev) => !prev)}
-            className="p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-200 transition"
+            className="p-4 btn-secondary"
             title="Alterar modo"
           >
             {cardMode ? (
-              <FaTable size={18} className="text-gray-900" />
+              <FaTable size={18} />
             ) : (
-              <FaThLarge size={18} className="text-gray-900" />
+              <FaThLarge size={18} />
             )}
           </motion.button>
         </div>
 
         <div className="flex items-center gap-3">
-          {extraButtons.map((btn, i) => (
-            <motion.button
-              key={i}
-              whileTap={{ scale: 0.9 }}
-              onClick={btn.onClick}
-              className={`flex items-center gap-2 px-6 h-12 rounded-md transition text-sm font-medium ${
-                btn.variant === "outlined"
-                  ? "border border-green-800 text-green-800 hover:bg-green-100"
-                  : "bg-green-800 text-white hover:bg-green-900"
-              }`}
-            >
-              {btn.icon}
-              {btn.label}
-            </motion.button>
-          ))}
+          {extraButtons.map((btn, i) => {
+            const ButtonContent = (
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={btn.confirmation ? undefined : btn.onClick}
+                className={btn.variant === "outlined" ? "btn-outline" : "btn-primary"}
+              >
+                {btn.icon}
+                {btn.label}
+              </motion.button>
+            );
+
+            if (btn.confirmation) {
+              return (
+                <ConfirmDialog
+                  key={i}
+                  trigger={ButtonContent}
+                  title={btn.confirmation.title}
+                  description={btn.confirmation.description}
+                  onConfirm={btn.onClick}
+                  variant={btn.confirmation.variant || 'primary'}
+                  icon={btn.confirmation.icon}
+                  confirmLabel={btn.confirmation.confirmLabel}
+                  cancelLabel={btn.confirmation.cancelLabel}
+                />
+              );
+            }
+
+            return <div key={i}>{ButtonContent}</div>;
+          })}
 
           {showAddButton && (
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => router.push(`${pathname}/form`)}
-              className="flex items-center gap-2 px-6 h-12 bg-green-800 text-white rounded-md hover:bg-green-900 transition text-base font-medium"
+              className="btn-primary"
             >
               <FaPlus /> Adicionar
             </motion.button>
@@ -186,7 +219,7 @@ export default function Table({
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-600 animate-pulse">
+        <div className="text-center py-12 text-foreground/50 animate-pulse">
           Carregando dados...
         </div>
       ) : cardMode ? (
@@ -194,15 +227,13 @@ export default function Table({
           {paginatedData.length > 0 ? (
             paginatedData.map((row, i) => (
               <div
-                key={i}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition"
+                key={row.id || i}
+                className="bg-card rounded-lg shadow-sm border border-border p-4 hover:shadow-md hover:border-green-500/30 transition-all"
               >
                 {columns.map((col) => (
                   <div key={col.value} className="mb-2">
-                    <p className="text-xs text-gray-500">{col.heading}</p>
-                    <p
-                      className={'text-sm text-gray-800 font-medium text-left'}
-                    >
+                    <p className="text-xs text-foreground/50">{col.heading}</p>
+                    <p className="text-sm text-foreground font-medium text-left">
                       {row[col.value]}
                     </p>
                   </div>
@@ -210,42 +241,40 @@ export default function Table({
               </div>
             ))
           ) : (
-            <p className="text-center text-gray-500 py-6">
+            <p className="text-center text-foreground/50 py-6">
               Nenhum resultado encontrado.
             </p>
           )}
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-t-lg">
+          <div className="overflow-x-auto rounded-t-lg border border-border">
             <table className="w-full border-collapse text-sm">
               <thead>
-                <tr className="bg-green-800 text-white">
+                <tr className="table-header-row">
                   {columns.map((col) => (
                     <th
                       key={col.value}
-                      className={`py-4 px-4 text-${
-                        col.align ?? "left"
-                      }`}
+                      className={`py-4 px-4 text-${col.align ?? "left"}`}
                     >
                       {col.heading}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="bg-card">
                 {paginatedData.length > 0 ? (
                   paginatedData.map((row, i) => (
                     <tr
                       key={i}
-                      className="border-b border-gray-200 hover:bg-gray-50 transition"
+                      className="border-b border-border hover:bg-background/50 transition-colors"
                     >
                       {columns.map((col) => (
                         <td
                           key={`${i}-${col.value}`}
-                          className={`py-4 px-4 ${
-                           col.align === "center" ? "text-center"
-                           : col.align === "right" ? "text-right": "text-left"
+                          className={`py-4 px-4 text-foreground ${
+                            col.align === "center" ? "text-center"
+                            : col.align === "right" ? "text-right": "text-left"
                           }`}
                         >
                           {row[col.value]}
@@ -257,7 +286,7 @@ export default function Table({
                   <tr>
                     <td
                       colSpan={columns.length}
-                      className="text-center text-gray-500 py-6"
+                      className="text-center text-foreground/50 py-6"
                     >
                       Nenhum resultado encontrado.
                     </td>
@@ -268,13 +297,13 @@ export default function Table({
           </div>
         
 
-          <div className="flex items-center justify-between gap-4 mt-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-6 text-foreground/70">
             <div>
-              <span>{`Mostrando ${startItem} - ${endItem} de ${filteredData.length} registros`}</span>
+              <span className="text-sm">{`Mostrando ${startItem} - ${endItem} de ${filteredData.length} registros`}</span>
             </div>
             <div className="flex items-center justify-end gap-4">
               <select
-                className="border border-gray-300 rounded-md px-2 h-10"
+                className="input-base h-10 px-2 rounded-md bg-card text-foreground"
                 value={itemsPerPage}
                 onChange={(e) => {
                   setItemsPerPage(Number(e.target.value));
@@ -290,17 +319,17 @@ export default function Table({
 
               <div className="flex items-center gap-2">
                 <button
-                  className="px-3 h-10 border rounded-md hover:bg-gray-200 disabled:opacity-50"
+                  className="btn-secondary h-10 px-3 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((prev) => prev - 1)}
                 >
                   <FaChevronLeft />
                 </button>
-                <span>
+                <span className="text-foreground font-medium">
                   {currentPage} / {totalPages}
                 </span>
                 <button
-                  className="px-3 h-10 border rounded-md hover:bg-gray-200 disabled:opacity-50"
+                  className="btn-secondary h-10 px-3 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((prev) => prev + 1)}
                 >

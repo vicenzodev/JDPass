@@ -5,26 +5,52 @@ import PageTemplate from "@/components/pageTemplate";
 import DataTable from "@/components/table";
 import { MdEdit } from "react-icons/md";
 import { BiTrash } from "react-icons/bi";
-import { columns } from "../usuarios/options";
+import { formatDate, parseLocalDate } from "@/utils/data";
+import { Usuario } from "../usuarios/page";
+import { columns, getStatusConfig } from "./options";
+import { IoMdCloudDownload } from "react-icons/io";
+import { useGenerateLogsPDF } from "@/hook/useGenerateLogsPDF";
+import { DateRangeDialog } from "@/components/dateRangeDialog";
+import { toast } from "react-toastify";
 
 type Logs = {
-  usuario: string;
-  email: string;
-  cargo: number;
+  event: string;
+  status: string;
+  date: Date;
+  uta: Usuario;
 };
 
-export default function ListarSenhasPage() {
+export default function ListarLogsPage() {
   const [loading, setLoading] = useState(false);
+  const [openPeriodModal, setOpenPeriodModal] = useState(false);
   const [logs, setLogs] = useState<Logs[]>();
+  const { generatePDF } = useGenerateLogsPDF();
+
+  const handleGenerateReport = (start: string, end: string) => {
+    const startDate = parseLocalDate(start);
+    const endDate = parseLocalDate(end);
+    endDate.setHours(23, 59, 59, 999);
+
+    const filtered = logs?.filter(log => {
+      const d = new Date(log.date);
+      return d >= startDate && d <= endDate;
+    }) ?? [];
+
+    if (filtered.length === 0) {
+      return toast.error("Não existem logs nesse espaço de data");
+    }
+
+    generatePDF(filtered);
+  };
 
   const getLogs = async () => {
      setLoading(true);
     try {
-        const response = await fetch("/api/uta", {
+        const response = await fetch("/api/logs", {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
-        if (!response.ok) throw new Error("Senhas não encontradas");
+        if (!response.ok) throw new Error("Logs não encontradas");
         const data = await response.json();
         setLogs(data);
     } finally {
@@ -40,19 +66,11 @@ export default function ListarSenhasPage() {
     if (!logs?.length) return [];
 
     return logs.map((item) => ({
-      usuario: item.usuario,
-      email: item.email,
-      cargo: item.cargo,
-      actions: (
-        <span className="flex justify-center gap-4">
-          <button title="Editar">
-            <MdEdit size={18} />
-          </button>
-          <button title="Excluir">
-            <BiTrash size={18} />
-          </button>
-        </span>
-      ),
+      event: item.event,
+      user: item.uta.usuario,
+      email: item.uta.email,
+      status: getStatusConfig(item.status),
+      date: formatDate(item.date),
     }));
   };
 
@@ -65,11 +83,29 @@ export default function ListarSenhasPage() {
         onRefresh={() => {
           getLogs();
         }}
-        showAddButton
+        showAddButton={false}
         filterOptions={[
+          { label: "Situação", value: "status", type: "select", options: [
+            { label: "Sucesso", value: "Sucesso" },
+            { label: "Alerta", value: "Alerta" },
+            { label: "Erro", value: "Erro" },
+          ] },
           { label: "Usuário", value: "usuario", type: "text" },
-          { label: "Cargo", value: "cargo", type: "text" },
         ]}
+        extraButtons={[
+          {
+            label: "Gerar Relatório",
+            icon: <IoMdCloudDownload  size={18} />,
+            onClick: () => setOpenPeriodModal(true),
+            variant: "default",
+          },
+        ]}
+      />
+
+      <DateRangeDialog
+        open={openPeriodModal}
+        onOpenChange={setOpenPeriodModal}
+        onConfirm={handleGenerateReport}
       />
     </PageTemplate>
   );

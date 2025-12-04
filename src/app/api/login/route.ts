@@ -22,7 +22,7 @@ export const POST = async (req:NextRequest) => {
         const utaId = await getUserSession();
         if(!utaId) throw new Error("Não foi reconhecido o usuário");
         createLog({
-            event:"Usuário criado com sucesso",
+            event:"Usuário acessado com sucesso",
             status:"200",
             date:new Date(),
             utaId: utaId.id

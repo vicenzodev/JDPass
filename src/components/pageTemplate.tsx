@@ -9,17 +9,20 @@ export default function PageTemplate({ routerBack, title, children }: { routerBa
     const router = useRouter();
 
     return (
-        <div className="px-8 py-4 min-h-screen">
+        <div className="px-8 py-4 min-h-screen bg-background text-foreground transition-colors duration-300">
+            
             <header className="flex gap-4 items-center justify-start mb-4">
                 <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={() => routerBack ? router.replace(routerBack) : router.back()}
-                    className="py-2 px-3 bg-white border border-gray-200 rounded-xl shadow-sm cursor-pointer"
+                    className="py-2 px-3 bg-card border border-border rounded-xl shadow-sm cursor-pointer text-foreground hover:bg-background/80 transition-colors"
                 >
                     <FaArrowLeft size={22} />
                 </motion.button>
-                <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+                
+                <h2 className="text-2xl font-bold text-foreground">{title}</h2>
             </header>
+            
             {children}
         </div>
     )

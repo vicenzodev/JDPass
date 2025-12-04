@@ -29,20 +29,32 @@ export const createUs = async (data:IUs): Promise<Omit<IUs,'senhas'>> =>{
     return result;
 }
 
-export const getUs = async (utaId:number) =>{
-    const us = await prisma.us.findMany({where:{utaId:utaId}});
-    if(!us) throw new Error("Nenhum usuário de sistema encontrado :(");
-    let usNoPassword = [];
-    for(const data of us){
-        const {senhas, ...result} = data;
-        usNoPassword.push(result);
-    }
-    return usNoPassword;
-}
+export const getUs = async (utaCargo: number) => {
+    const us = await prisma.us.findMany({
+        where: {
+            uta: {
+                cargo: {
+                    lte: utaCargo
+                }
+            }
+        }
+    });
 
-export const getUsById = async (id: number, utaId: number) => {
+    if (!us || us.length === 0) {
+        throw new Error("Nenhum usuário de sistema encontrado :(");
+    }
+
+    const usNoPassword = us.map((data) => {
+        const { senhas, ...result } = data;
+        return result;
+    });
+
+    return usNoPassword;
+};
+
+export const getUsById = async (id: number) => {
     const us = await prisma.us.findFirst({
-        where: { id, utaId }
+        where: { id }
     });
 
     if (!us) return null;

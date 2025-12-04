@@ -23,17 +23,17 @@ export const POST = async (req:NextRequest) => {
             utaId:id.id
         });
 
-        if(!us) throw new Error("Não foi possível criar o usuário");
+        if(!us) throw new Error("Não foi possível criar a senha");
 
         createLog({
-            event: "Usuário criado com sucesso!",
+            event: "Senha criada com sucesso!",
             status:"200",
             date:new Date(),
             utaId: id.id
         });
 
         return NextResponse.json({
-            message:'Usuário criado com sucesso!'
+            message:'Senha criada com sucesso!'
         },{status:200});
     }catch(error){
         createLog({
@@ -75,7 +75,7 @@ export const GET = async (req: NextRequest) => {
       if (isNaN(usId)) {
         createLog({
             event: "ID inválido",
-            status:"400",
+            status: "400",
             date:new Date(),
             utaId: 0
         });
@@ -85,7 +85,7 @@ export const GET = async (req: NextRequest) => {
         );
       }
 
-      const us = await getUsById(usId, session.id);
+      const us = await getUsById(usId);
 
       if (!us) {
         createLog({
@@ -101,7 +101,7 @@ export const GET = async (req: NextRequest) => {
       }
 
       createLog({
-          event: JSON.stringify("Usuário acessado com sucesso"),
+          event: JSON.stringify("Senha encontrada com sucesso"),
           status:"200",
           date:new Date(),
           utaId: session.id
@@ -110,7 +110,7 @@ export const GET = async (req: NextRequest) => {
       return NextResponse.json(us, { status: 200 });
     }
 
-    const usList = await getUs(session.id);
+    const usList = await getUs(session.cargo);
     return NextResponse.json(usList, { status: 200 });
 
   } catch (error) {
@@ -185,7 +185,7 @@ export const PATCH = async (req: NextRequest) => {
     }
 
     createLog({
-        event: "Atualizado com sucesso",
+        event: "Senha atualizada com sucesso",
         status:"200",
         date:new Date(),
         utaId: session.id
@@ -255,7 +255,7 @@ export const DELETE = async (req: NextRequest) => {
       );
     }
 
-    const existing = await getUsById(usId, session.id);
+    const existing = await getUsById(usId);
     if (!existing) {
       createLog({
           event: "Registro não encontrado ou não pertence ao usuário",
@@ -286,7 +286,7 @@ export const DELETE = async (req: NextRequest) => {
     }
 
     createLog({
-        event: "Excluido com sucesso!",
+        event: "Senha excluida com sucesso!",
         status:"200",
         date:new Date(),
         utaId: session.id

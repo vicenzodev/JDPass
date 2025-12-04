@@ -13,7 +13,14 @@ export const createLog = async (data:Ilogs): Promise<Ilogs> =>{
 }
 
 export const getAllLogs = async (): Promise<Ilogs[]> =>{
-    const logs = await prisma.logs.findMany();
+    const logs = await prisma.logs.findMany({
+        orderBy: {
+            date: 'desc'
+        },
+        include: {
+            uta: true,
+        },
+    });
     return logs;
 }
 

@@ -11,10 +11,19 @@ export const GET = async (req:NextRequest) =>{
     
     try{
         const id = await getUserSession();
-        if(!id) throw new Error("Não autorizado");
+        if (!id) throw new Error("Não autorizado");
         const userCargo = await findUtaById(id.id);
         
-        if(userCargo.cargo < cargoToResetPasswords) throw new Error("Não autorizado :(");
+        if (userCargo.cargo < cargoToResetPasswords) {
+            createLog({
+                event: JSON.stringify("Tentativa de reset de senha negado"),
+                status:"401",
+                date:new Date(),
+                utaId: 0
+            });
+
+            return NextResponse.json({error: "Você não possui autorização para isso."},{status: 500});
+        }
 
         const usersToReset = await verifyExpDate();
         for(const user of usersToReset){

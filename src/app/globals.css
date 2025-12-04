@@ -1,8 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f3f2;
-  --foreground: #171717;
+  --background: #f9fafb;
+  --foreground: #292524;
+  
+  --card: #fefefe;
+  --card-foreground: #111827;
+  
+  --border: #e5e7eb;
+
+  --font-scale: 1;
+  --transition-speed: 0.3s;
+}
+
+:root.dark {
+  --background: #111827;
+  --foreground: #f3f4f6;
+
+  --card: #1f2937;
+  --card-foreground: #f3f4f6;
+  
+  --border: #374151;
 }
 
 button, motion.button {
@@ -12,19 +30,167 @@ button, motion.button {
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
-/* 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+
+  transition: background-color var(--transition-speed) ease, 
+              color var(--transition-speed) ease,
+              font-size 0.2s ease-in-out;
+}
+
+html[data-font-size="1"] {
+  font-size: 14px;
+}
+
+html[data-font-size="2"] {
+  font-size: 16px;
+}
+
+html[data-font-size="3"] {
+  font-size: 18px;
+}
+
+@layer components {
+  :root {
+    --brand-color: #166534;
+    --brand-hover: #14532d;
+  }
+
+  :root.dark {
+    --brand-color: #15803d;
+    --brand-hover: #16a34a;
+  }
+
+  .input-base {
+    @apply h-12 border focus:outline-none transition-colors;
+    background-color: var(--card);
+    border-color: var(--border);
+    color: var(--foreground);
+  }
+  
+  .badge-base {
+    @apply px-2 py-1 rounded text-xs font-semibold border;
+  }
+  
+  .badge-success {
+    background-color: #dcfce7;
+    color: #166534;
+    border-color: #bbf7d0;
+  }
+  :root.dark .badge-success {
+    background-color: rgba(34, 197, 94, 0.15); 
+    color: #4ade80;
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+
+  .badge-warning {
+    background-color: #fef9c3;
+    color: #854d0e;
+    border-color: #fde047;
+  }
+  :root.dark .badge-warning {
+    background-color: rgba(234, 179, 8, 0.15);
+    color: #facc15;
+    border-color: rgba(234, 179, 8, 0.3);
+  }
+
+  .badge-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
+  }
+  :root.dark .badge-error {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .badge-default {
+    background-color: #f3f4f6;
+    color: #374151;
+    border-color: #e5e7eb;
+  }
+  :root.dark .badge-default {
+    background-color: rgba(107, 114, 128, 0.2);
+    color: #d1d5db;
+    border-color: rgba(107, 114, 128, 0.3);
+  }
+
+  .expiration-item {
+    @apply flex items-center justify-between p-3 border-l-4 rounded-r-md transition-colors;
+    
+    background-color: #fefce8;
+    border-color: #facc15;
+  }
+
+  :root.dark .expiration-item {
+    background-color: rgba(113, 63, 18, 0.2);
+    border-color: #ca8a04;
+  }
+
+  .expiration-days {
+    @apply block text-sm font-bold;
+    
+    color: #a16207;
+  }
+
+  :root.dark .expiration-days {
+    color: #facc15;
+  }
+
+  .table-header-row {
+    @apply text-white transition-colors duration-300;
+    background-color: var(--brand-color);
+  }
+
+  .btn-primary {
+    @apply flex items-center gap-2 px-6 h-12 rounded-md text-base font-medium transition-colors text-white;
+    background-color: var(--brand-color);
+  }
+  .btn-primary:hover {
+    background-color: var(--brand-hover);
+  }
+
+  .btn-outline {
+    @apply flex items-center gap-2 px-6 h-12 rounded-md text-base font-medium transition-colors border;
+    border-color: var(--brand-color);
+    color: var(--brand-color);
+  }
+  .btn-outline:hover {
+    background-color: #f0fdf4;
+  }
+
+  :root.dark .btn-outline {
+    border-color: #4ade80; 
+    color: #4ade80;
+  }
+  :root.dark .btn-outline:hover {
+    background-color: rgba(22, 101, 52, 0.2);
+  }
+
+  .btn-secondary {
+    @apply border rounded-lg transition-colors flex items-center justify-center;
+    background-color: var(--card);
+    border-color: var(--border);
+    color: var(--foreground);
+  }
+  .btn-secondary:hover {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+
+  .bg-select {
+    background-color: #edf2f7;
+  }
+  :root.dark .bg-select {
+    background-color: #111827;
+  }
 }

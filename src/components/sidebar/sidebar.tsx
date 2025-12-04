@@ -12,11 +12,35 @@ import { usePathname } from 'next/navigation';
 export default function Sidebar() {
   const { sidebarOpen: open, toggleSidebar } = useLayout();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
-
+  
+  const [userCargo, setUserCargo] = useState<number | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
-    const parent = navItems.find((item) => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/api/mw'); 
+        
+        if (response.ok) {
+          const data = await response.json();
+          setUserCargo(data.cargo);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar permissões do usuário", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const hasPermission = (item: any) => {
+    if (!item.adminOnly) return true;
+
+    return userCargo === 3;
+  };
+
+  useEffect(() => {
+    const parent = navItems.filter(hasPermission).find((item) => {
       if (!item.children) return false;
       const matchChild = item.children.some((child) => child.href === pathname);
       const matchPrefix = pathname.startsWith(item.prefix || '');
@@ -28,7 +52,7 @@ export default function Sidebar() {
     } else {
       setActiveMenu(null);
     }
-  }, [pathname]);
+  }, [pathname, userCargo]);
 
   const toggleMenu = (label: string) => {
     setActiveMenu(activeMenu === label ? null : label);
@@ -37,7 +61,7 @@ export default function Sidebar() {
   return (
     <motion.aside
       initial={false}
-      animate={{ width: open ? 300 : 80 }}
+      animate={{ width: open ? 300 : 65 }}
       transition={{ duration: 0.3 }}
       className="fixed left-0 top-0 h-screen flex flex-col bg-green-900 border-r border-white/10 shadow-[0_0_30px_rgba(0,255,0,0.05)] text-white z-50"
     >
@@ -67,7 +91,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-5">
-        {navItems.map((item) => (
+        {navItems.filter(hasPermission).map((item) => (
           <div key={item.label} className="mb-2">
             {item.children ? (
               <>
@@ -103,8 +127,8 @@ export default function Sidebar() {
                           className={`flex items-center text-md text-gray-200
                             px-3 py-3 mt-2 rounded-lg hover:bg-white/10 hover:text-green-300 transition
                             ${open ? 'gap-3' : ''} ${
-                              pathname === child.href ? 'bg-white/10 text-green-300' : ''
-                            }`}
+                            pathname === child.href ? 'bg-white/10 text-green-300' : ''
+                          }`}
                           title={child.label}
                         >
                           <child.icon size={22} className="text-green-400 min-w-[22px]" />

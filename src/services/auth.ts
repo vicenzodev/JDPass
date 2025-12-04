@@ -10,7 +10,7 @@ export const getUserSession = async () =>{
     if(!secret) return null;
 
     try{
-        const payload = jwt.verify(token, secret) as {id:number; email:string;};
+        const payload = jwt.verify(token, secret) as {id:number; email:string; cargo:number;};
         return payload;
     }catch(e:any){
         return null;

@@ -26,6 +26,12 @@ export default function UsuariosForm() {
     cargo: "",
   });
 
+  const isFormValid =
+    formData.usuario.trim() !== "" &&
+    formData.email.trim() !== "" &&
+    (editingId || formData.senha.trim() !== "") &&
+    formData.cargo !== "";
+
   useEffect(() => {
     if (!editingId) return;
 
@@ -52,19 +58,25 @@ export default function UsuariosForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isFormValid) return;
+
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/uta${editingId ? `?id=${editingId}` : ""}`, {
-        method: editingId ? "PATCH" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          usuario: formData.usuario,
-          email: formData.email,
-          senha: formData.senha || undefined, // se vazio no PATCH → não altera
-          cargo: Number(formData.cargo),
-        }),
-      });
+      const response = await fetch(
+        `/api/uta${editingId ? `?id=${editingId}` : ""}`,
+        {
+          method: editingId ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            usuario: formData.usuario,
+            email: formData.email,
+            senha: formData.senha || undefined,
+            cargo: Number(formData.cargo),
+          }),
+        }
+      );
 
       if (!response.ok) throw new Error("Erro ao salvar");
 
@@ -83,7 +95,9 @@ export default function UsuariosForm() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -92,103 +106,124 @@ export default function UsuariosForm() {
   return (
     <PageTemplate
       title={editingId ? "Editar Usuário" : "Cadastrar Usuário"}
-      routerBack="/usuarios"
+      routerBack="/admin/usuarios"
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="w-full bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/50 overflow-hidden"
+        className="w-full bg-card/90 backdrop-blur-lg rounded-2xl shadow-xl border border-border overflow-hidden transition-colors duration-300"
       >
         <form onSubmit={handleSubmit} className="p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* COLUNA 1 */}
             <div className="space-y-6">
-              <InputWrapper label="Nome do Usuário" icon={<BiUser size={16} />}>
+              <InputWrapper
+                label="Nome do Usuário"
+                icon={<BiUser size={16} />}
+                required={true}
+              >
                 <input
                   required
                   type="text"
                   name="usuario"
                   value={formData.usuario}
                   onChange={handleChange}
-                  placeholder="nome do usuário"
-                  className="w-full h-12 px-4 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-800"
+                  placeholder="Ex: João Silva"
+                  className="input-base w-full rounded-lg px-4 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent"
                 />
               </InputWrapper>
 
-              <InputWrapper label="E-mail / Login" icon={<MdOutlineEmail size={16} />}>
+              <InputWrapper
+                label="E-mail / Login"
+                icon={<MdOutlineEmail size={16} />}
+                required={true}
+              >
                 <input
                   required
                   type="text"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="nome.sobrenome"
-                  className="w-full h-12 px-4 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-800"
+                  placeholder="joao.silva"
+                  className="input-base w-full rounded-lg px-4 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent"
                 />
               </InputWrapper>
             </div>
 
             <div className="space-y-6">
-              <InputWrapper label="Senha" icon={<BiKey size={16} />}>
-                <div className="relative">
-                  <input
-                    type={formData.senha ? (showPassword ? "text" : "password") : "text"}
-                    name="senha"
-                    value={formData.senha}
-                    onChange={handleChange}
-                    placeholder={editingId ? "Deixe em branco para manter" : "************"}
-                    className="w-full h-12 px-4 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-800"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3.5 text-gray-400 hover:text-green-800"
-                  >
-                    {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
-                  </button>
-                </div>
-              </InputWrapper>
-
-              <InputWrapper label="Cargo" icon={<FaSuitcase size={16} />}>
+              <InputWrapper
+                label="Cargo"
+                icon={<FaSuitcase size={14} />}
+                required={true}
+              >
                 <select
                   required
                   name="cargo"
                   value={formData.cargo}
                   onChange={handleChange}
-                  className="w-full h-12 px-4 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-800 text-gray-700 cursor-pointer"
+                  className="input-base w-full rounded-lg px-4 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent cursor-pointer"
                 >
                   <option value="">Selecione...</option>
-                  <option value={1}>1</option>
-                  <option value={2}>2</option>
-                  <option value={3}>3</option>
+                  <option value="0">Operacional</option>
+                  <option value="1">Supervisor</option>
+                  <option value="2">Gestor</option>
+                  <option value="3">Gerente</option>
                 </select>
+              </InputWrapper>
+
+              <InputWrapper
+                label="Senha"
+                icon={<BiKey size={16} />}
+                required={!editingId}
+              >
+                <div className="relative">
+                  <input
+                    required={!editingId}
+                    type={showPassword ? "text" : "password"}
+                    name="senha"
+                    value={formData.senha}
+                    onChange={handleChange}
+                    placeholder={editingId ? "Deixe em branco para manter a mesma senha" : "************"}
+                    className="input-base w-full rounded-lg px-4 pr-12 focus:ring-2 focus:ring-[var(--brand-color)] focus:border-transparent"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3.5 text-foreground/50 hover:text-[var(--brand-color)] transition-colors"
+                  >
+                    {showPassword ? <AiFillEyeInvisible size={20} /> : <AiFillEye size={20} />}
+                  </button>
+                </div>
               </InputWrapper>
             </div>
           </div>
 
-          <div className="flex flex-col-reverse md:flex-row items-center justify-end gap-4 pt-6 border-t border-gray-200">
+          <div className="flex flex-col-reverse md:flex-row items-center justify-end gap-4 pt-6 border-t border-border">
             <button
               type="button"
               onClick={() => router.back()}
-              className="w-full md:w-auto h-12 px-8 flex items-center justify-center gap-2 border border-gray-300 text-gray-600 text-lg rounded-lg hover:bg-gray-100 hover:text-gray-800"
+              className="w-full md:w-auto h-12 px-8 flex items-center justify-center gap-2 border border-border text-foreground/70 rounded-lg hover:bg-background hover:text-foreground transition-colors"
             >
-              <BiX size={24} /> Cancelar
+              <BiX size={20} /> Cancelar
             </button>
 
             <motion.button
-              whileTap={{ scale: 0.95 }}
+              whileTap={!loading && isFormValid ? { scale: 0.95 } : {}}
               type="submit"
-              disabled={loading}
-              className={`w-full md:w-auto h-12 px-10 flex items-center justify-center gap-2 bg-green-800 text-white text-lg rounded-lg hover:bg-green-900 shadow-lg shadow-green-900/20 ${
-                loading ? "opacity-70 cursor-wait" : ""
-              }`}
+              disabled={loading || !isFormValid}
+              className={`w-full md:w-auto px-10 flex items-center justify-center gap-2 shadow-lg transition-all btn-primary
+                ${
+                  loading || !isFormValid
+                    ? "opacity-50 cursor-not-allowed shadow-none bg-gray-400 dark:bg-gray-600"
+                    : "shadow-[var(--brand-color)]/20"
+                }
+              `}
             >
               {loading ? (
                 <span className="animate-pulse">Salvando...</span>
               ) : (
                 <>
-                  <BiSave size={24} /> Salvar
+                  <BiSave size={20} /> Salvar
                 </>
               )}
             </motion.button>

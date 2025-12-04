@@ -10,48 +10,96 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { FaChartLine } from "react-icons/fa";
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
-const data = {
-  labels: ["Seg", "Ter", "Qua", "Qui", "Sex"],
-  datasets: [
-    {
-      label: "Senhas Geradas",
-      data: [12, 20, 18, 25, 22],
-      borderColor: "#22c55e",
-      backgroundColor: "rgba(34,197,94,0.2)",
-      tension: 0.4,
-      pointBackgroundColor: "#166534",
-      pointRadius: 5,
+interface GraficoProps {
+  dados: { date: string; count: number }[];
+}
+
+export default function GraficoSenhas({ dados }: GraficoProps) {
+  
+  const labels = dados.map(item => {
+    const [ano, mes, dia] = item.date.split('-').map(Number);
+    const d = new Date(ano, mes - 1, dia);
+    
+    const diaSemana = d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+    const diaMes = d.getDate();
+    return `${diaSemana} ${diaMes}`; 
+  });
+
+  const values = dados.map(item => item.count);
+
+  const chartData = {
+    labels: labels,
+    datasets: [
+      {
+        label: "Senhas",
+        data: values,
+        borderColor: "#22c55e",
+        backgroundColor: "rgba(34,197,94,0.2)",
+        tension: 0.4,
+        pointBackgroundColor: "#166534",
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        fill: true,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { 
+        mode: "index" as const, 
+        intersect: false,
+        backgroundColor: 'rgba(0,0,0,0.9)',
+        padding: 10,
+        callbacks: {
+           title: (context: any) => context[0].label
+        }
+      },
     },
-  ],
-};
+    scales: {
+      x: { 
+        grid: { display: false },
+        ticks: { 
+            font: { size: 11 },
+            color: '#808080'
+        }
+      },
+      y: { 
+        beginAtZero: true, 
+        ticks: { 
+            stepSize: 1, 
+            precision: 0,
+            color: '#9ca3af'
+        },
+        grid: {
+            color: 'rgba(156, 163, 175, 0.1)'
+        }
+      },
+    },
+  };
 
-const options = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: { display: false },
-    tooltip: { mode: "index" as const, intersect: false },
-  },
-  scales: {
-    x: { grid: { display: false } },
-    y: { beginAtZero: true },
-  },
-};
-
-export default function GraficoSenhas() {
   return (
-    <div className="p-5 bg-white border border-gray-200 rounded-xl shadow-sm w-full">
-      <h2 className="text-lg font-semibold text-gray-700 mb-3">
-        Senhas Geradas na Semana
+    <div className="p-5 bg-card border border-border rounded-xl shadow-sm w-full min-h transition-colors duration-300">
+      
+      <h2 className="text-lg font-semibold text-card-foreground mb-4 flex items-center gap-2">
+        <FaChartLine size={20} className="text-foreground/60" /> Movimentação da Semana
       </h2>
 
       <div className="w-full h-[250px]">
-        <div className="w-full h-full">
-          <Line data={data} options={options} width="100%" height="100%" />
-        </div>
+        {dados.length > 0 ? (
+           <Line data={chartData} options={options} />
+        ) : (
+           <div className="h-full flex items-center justify-center text-foreground/50">
+             Carregando dados...
+           </div>
+        )}
       </div>
     </div>
   );

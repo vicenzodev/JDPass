@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import PageTemplate from "@/components/pageTemplate";
 import DataTable from "@/components/table";
 import { columns } from "./options";
-import { MdEdit } from "react-icons/md";
+import { MdEdit, MdSync } from "react-icons/md";
 import { formatDate } from "@/utils/data";
 import { BiTrash } from "react-icons/bi";
 import { useRouter } from "next/navigation";
 import ConfirmDialog from "@/components/confirmDialog";
 import { toast } from "react-toastify";
+import { AiFillWarning } from "react-icons/ai";
 
 type Senha = {
   id: string;
@@ -31,7 +32,7 @@ export default function ListarSenhasPage() {
   const router = useRouter();
 
   const getPasswords = async () => {
-     setLoading(true);
+    setLoading(true);
     try {
         const response = await fetch("/api/us", {
           method: 'GET',
@@ -42,6 +43,50 @@ export default function ListarSenhasPage() {
         setSenhas(data);
     } finally {
         setLoading(false);
+    }
+  };
+
+  const resetExpiredPassword = async () => {
+    try {
+      const res = await fetch("/api/reset", {
+        method: 'GET',
+      })
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data?.error || "Falha ao resetar senhas");
+      }
+
+      const result = await res.json();
+      toast.success("Senhas resetadas com sucesso!");
+
+      getPasswords();
+    } catch (error:any) {
+      toast.error(error.message || "Erro ao resetar senhas");
+    }
+  }
+
+  const resetPassword = async (userId: string) => {
+    try {
+      const res = await fetch("/api/reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: userId }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data?.error || "Erro ao resetar senha");
+      }
+
+      const result = await res.json();
+      toast.success(result.message || "Senha resetada!");
+
+      getPasswords();
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao resetar senha individual");
     }
   };
 
@@ -76,10 +121,22 @@ export default function ListarSenhasPage() {
       sistema: item.sistema,
       usuario: item.usuario,
       ambiente: item.ambiente,
-      lastChange: formatDate(item.last_change),
+      lastChange: formatDate(item.last_change, true),
       expDate: formatDate(item.exp_date),
       actions: (
         <span className="flex justify-center gap-4">
+          <ConfirmDialog
+            trigger={
+              <button title="Resetar Senha">
+                <MdSync size={20} />
+              </button>
+            }
+            title="Resetar Senha"
+            description="Tem certeza que deseja resetar esta senha? Essa ação criará uma senha aleatória para o item."
+            onConfirm={() => resetPassword(item.id)}
+            variant="success"
+            icon={<AiFillWarning size={24} />}
+          />
           <button title="Editar" onClick={() => router.push(`/senhas/form?id=${item.id}`)}>
             <MdEdit size={18} />
           </button>
@@ -92,6 +149,7 @@ export default function ListarSenhasPage() {
             title="Excluir Senha?"
             description="Tem certeza que deseja excluir esta senha? Esta ação não pode ser desfeita."
             onConfirm={() => handleDelete(item.id)}
+            icon={<AiFillWarning size={24} />}
           />
         </span>
       ),
@@ -111,7 +169,27 @@ export default function ListarSenhasPage() {
         filterOptions={[
           { label: "Sistema", value: "sistema", type: "text" },
           { label: "Usuário", value: "usuario", type: "text" },
-          { label: "Ambiente", value: "ambiente", type: "text" },
+          { label: "Cargo", value: "cargo", type: "select", options: [
+            { label: "DEV", value: "DEV" },
+            { label: "TESTE", value: "TESTE" },
+            { label: "HML", value: "HML" },
+            { label: "PROD", value: "PROD" },
+          ] },
+        ]}
+        extraButtons={[
+          {
+            label: "Resetar Senhas",
+            icon: <MdSync size={18} />,
+            onClick: resetExpiredPassword,
+            variant: "default",
+            confirmation: {
+              title: "Resetar Senhas Expiradas",
+              description: "Você tem certeza que deseja resetar todas as senhas expiradas? Essa ação afetará múltiplos registros.",
+              variant: "success",
+              icon: <AiFillWarning size={24} />,
+              confirmLabel: "Sim, Resetar"
+            }
+          },
         ]}
       />
     </PageTemplate>

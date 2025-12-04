@@ -45,8 +45,9 @@ export const loginUta = async (data:ILogin) =>{
     if(!secret) throw new Error("A chave secreta JWT_SECRET não está configurada no .env");
     
     const payload = {
-        id:uta.id,
+        id: uta.id,
         email: uta.email,
+        cargo: uta.cargo,
     }
 
     const token = jwt.sign(
@@ -58,8 +59,15 @@ export const loginUta = async (data:ILogin) =>{
     return {token};
 }
 
-export const listUta = async () => {
-    const uta = await prisma.uta.findMany();
+export const listUta = async (currentUserId: number) => {
+    const uta = await prisma.uta.findMany({
+        where: {
+            id: {
+                not: currentUserId
+            }
+        }
+    });
+    
     if(!uta) throw new Error("Nenhum usuário de sistema encontrado");
 
     const result = uta.map(({ senha, ...rest }) => rest);

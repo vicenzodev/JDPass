@@ -1,11 +1,8 @@
 import { ElementType } from "react";
 import { TbLayoutDashboard } from "react-icons/tb";
-import { LuFileText, LuKeyRound } from "react-icons/lu";
-import { FaHistory, FaUser, FaUsers } from "react-icons/fa";
+import { LuKeyRound } from "react-icons/lu";
+import { FaHistory, FaUsers } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
-import { CgProfile } from "react-icons/cg";
-import { RiLockPasswordFill } from "react-icons/ri";
-import { MdAccessTime } from "react-icons/md";
 
 type NavItem = {
   label: string;
@@ -36,7 +33,7 @@ export const navItems: NavItem[] = [
     href: "/senhas",
   },
   {
-    label: "Usuários",
+    label: "Gerenciamento de Usuários",
     icon: FaUsers,
     adminOnly: true,
     href: "/admin/usuarios",

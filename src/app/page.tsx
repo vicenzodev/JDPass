@@ -8,35 +8,33 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<"usuario" | "chave">("usuario");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [chave, setChave] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-        
+
     try {
-        const response = await fetch("/api/login", {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email:email, senha:senha }),
-        });
-        if (!response.ok) throw new Error("Usuário ou senha incorretos");
-        router.replace('/dashboard');
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, senha: senha }),
+      });
+      if (!response.ok) throw new Error("Usuário ou senha incorretos");
+      router.replace("/dashboard");
     } catch (e: any) {
-        setError(e.message ?? "Credenciais inválidas. Tente novamente.");
+      setError(e.message ?? "Credenciais inválidas. Tente novamente.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-     <div className="relative min-h-screen flex items-center justify-center bg-black">
+    <div className="relative min-h-screen flex items-center justify-center bg-black overflow-hidden">
       <Image
         src="/bg-john-deere.jpg"
         alt="John Deere Background"
@@ -45,132 +43,107 @@ export default function LoginPage() {
         className="object-cover opacity-90"
       />
 
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-black/60" />
 
       <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.97 }}
+        initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.6 }}
-        className="relative z-10 backdrop-blur-md bg-white/10 border border-white/20 shadow-2xl rounded-2xl w-full max-w-lg p-10 pt-8 h-[54vh] flex flex-col justify-between"
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="relative z-10 w-full max-w-md mx-4 md:mx-0 p-8 md:p-10 rounded-2xl shadow-2xl backdrop-blur-md bg-white/10 border border-white/20 flex flex-col gap-5"
       >
-        <div className="flex flex-col items-center">
-          <h1 className="text-3xl font-bold text-white">John Deere Pass</h1>
-          <p className="text-green-200 mt-2 text-center text-sm max-w-sm">
-            Acesse o sistema de gerenciamento de senhas corporativas
+        <div className="flex flex-col items-center text-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+            John Deere Pass
+          </h1>
+          <p className="text-green-200 mt-2 text-sm md:text-base max-w-xs leading-relaxed">
+            Acesse o sistema de gerenciamento corporativo
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-center">
-          <div className="relative w-full flex-1 flex items-center justify-center">
-            <AnimatePresence mode="wait">
-              {mode === "usuario" ? (
-                <motion.div
-                  key="usuario"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full space-y-6"
-                >
-                  <div className="w-full">
-                    <label className="block text-md font-semibold text-white">
-                      E-mail corporativo
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="mt-2 w-full border border-white/30 bg-white/20 rounded-md p-3 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-400 outline-none"
-                      placeholder="nome.sobrenome@deere.com"
-                      required
-                    />
-                  </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key="inputs"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col gap-3"
+            >
+              <div className="w-full">
+                <label className="block text-sm font-semibold text-gray-200 mb-1.5 ml-1">
+                  E-mail corporativo
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-black/20 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:bg-black/40 focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-all outline-none"
+                  placeholder="nome.sobrenome@deere.com"
+                  required
+                />
+              </div>
 
-                  <div className="w-full">
-                    <label className="block text-md font-semibold text-white">
-                      Senha
-                    </label>
-                    <div className="relative w-full">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        value={senha}
-                        onChange={(e) => setSenha(e.target.value)}
-                        className="mt-2 w-full border border-white/30 bg-white/20 rounded-md p-3 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-400 outline-none"
-                        placeholder="**************"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-2/6 text-white"
-                      >
-                        {showPassword ? <AiFillEyeInvisible size={20} /> : <AiFillEye size={20} />}
-                      </button>
-                    </div>
-                  </div>
-
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="chave"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full flex flex-col items-center justify-center"
-                >
-                  <div className="w-full">
-                      <label className="block text-md font-semibold text-white text-center mb-2">
-                        Chave de acesso
-                      </label>
-                      <input
-                        type="text"
-                        value={chave}
-                        onChange={(e) => setChave(e.target.value)}
-                        className="w-full border border-white/30 bg-white/20 rounded-md p-3 text-white 
-                                  placeholder-gray-300 focus:ring-2 focus:ring-green-400 outline-none text-center"
-                        placeholder="JD-ACCESS-001"
-                        required
-                      />
-                    </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+              <div className="w-full">
+                <label className="block text-sm font-semibold text-gray-200 mb-1.5 ml-1">
+                  Senha
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    className="w-full bg-black/20 border border-white/20 rounded-lg pl-4 pr-12 py-3 text-white placeholder-white/40 focus:bg-black/40 focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-all outline-none"
+                    placeholder="**************"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-white/70 hover:text-white transition-colors rounded-full hover:bg-white/10"
+                  >
+                    {showPassword ? (
+                      <AiFillEyeInvisible size={22} />
+                    ) : (
+                      <AiFillEye size={22} />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
 
           <motion.button
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            disabled={loading}
             type="submit"
-            className="w-full bg-green-600 text-white py-3 rounded-md font-semibold text-lg hover:bg-green-700 transition cursor-pointer"
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold text-lg shadow-lg shadow-green-900/20 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {loading ? "Entrando..." : "Entrar"}
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Entrando...
+              </span>
+            ) : (
+              "Entrar"
+            )}
           </motion.button>
         </form>
 
-        <div className="text-center mt-4">
-          <button
-            onClick={() => {
-              setMode(mode === "usuario" ? "chave" : "usuario")
-              setError("");
-            }}
-            className="text-sm text-green-300 font-medium hover:text-green-200 transition cursor-pointer"
-          >
-            {mode === "usuario"
-              ? "Entrar com chave de acesso"
-              : "Entrar com usuário e senha"}
-          </button>
-        </div>
-
-        {error && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="text-red-300 text-sm text-center mt-2"
-          >
-            {error}
-          </motion.p>
-        )}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <p className="text-red-300 bg-red-900/20 border border-red-500/30 rounded-md p-3 text-sm text-center">
+                {error}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );

@@ -7,9 +7,14 @@ export interface ColumnProps {
   sortValue?: string; 
 }
 
+export interface OptionsProps {
+  label: string;
+  value: string;
+}
+
 export interface FilterOption {
   label: string;
   value: string;
   type?: "text" | "select";
-  options?: string[];
+  options?: OptionsProps[];
 }

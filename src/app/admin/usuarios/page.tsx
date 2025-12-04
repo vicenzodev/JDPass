@@ -5,12 +5,13 @@ import PageTemplate from "@/components/pageTemplate";
 import DataTable from "@/components/table";
 import { MdEdit } from "react-icons/md";
 import { BiTrash } from "react-icons/bi";
-import { columns } from "./options";
+import { columns, getCargoLabel } from "./options";
 import ConfirmDialog from "@/components/confirmDialog";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { AiFillWarning } from "react-icons/ai";
 
-type Usuario = {
+export type Usuario = {
   id: string;
   usuario: string;
   email: string;
@@ -64,7 +65,7 @@ export default function ListarSenhasPage() {
     return users.map((item) => ({
       usuario: item.usuario,
       email: item.email,
-      cargo: item.cargo,
+      cargo: getCargoLabel(item.cargo),
       actions: (
         <span className="flex justify-center gap-4">
           <button title="Editar" onClick={() => router.push(`/admin/usuarios/form?id=${item.id}`)}>
@@ -79,6 +80,7 @@ export default function ListarSenhasPage() {
             title="Excluir Usuário?"
             description="Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita."
             onConfirm={() => handleDelete(item.id)}
+            icon={<AiFillWarning size={24} />}
           />
         </span>
       ),
@@ -97,7 +99,13 @@ export default function ListarSenhasPage() {
         showAddButton
         filterOptions={[
           { label: "Usuário", value: "usuario", type: "text" },
-          { label: "Cargo", value: "cargo", type: "text" },
+          { label: "E-mail", value: "email", type: "text" },
+          { label: "Cargo", value: "cargo", type: "select", options: [
+            { label: "Operacional", value: "Operacional" },
+            { label: "Supervisor", value: "Supervisor" },
+            { label: "Gestor", value: "Gestor" },
+            { label: "Gerente", value: "Gerente" },
+          ] },
         ]}
       />
     </PageTemplate>
