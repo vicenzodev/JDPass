@@ -20,7 +20,3 @@ O ecossistema do projeto foi construído com ferramentas modernas para garantir 
 * **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
 * **ORM / Banco de Dados:** [Prisma](https://www.prisma.io/) (com suporte para integração com bancos SQL)
 * **Estilização:** [Tailwind CSS](https://tailwindcss.com/)
-
-   ```bash
-   git clone [https://github.com/vicenzodev/JDPass.git](https://github.com/vicenzodev/JDPass.git)
-   cd JDPass
