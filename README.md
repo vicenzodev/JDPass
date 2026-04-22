@@ -1,36 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# JDPass - Gerenciador de Senhas Corporativo
 
-## Getting Started
+O **JDPass** é um sistema de gerenciamento de senhas desenvolvido como parte de um projeto acadêmico da **Fatec Indaiatuba** em colaboração com a **John Deere**. O objetivo principal é fornecer uma solução segura, intuitiva e eficiente para o armazenamento e recuperação de credenciais, mitigando riscos de segurança relacionados à gestão de acessos.
+O projeto proposto foi desenvolvido com base numa aplicação antiga e, nos foi proposto a tarefa de otimizá-la e garantir um bom e atualizado funcionamento.
 
-First, run the development server:
+## 🚀 Sobre o Projeto
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+O projeto nasceu da necessidade de centralizar e proteger informações sensíveis dentro de um ambiente corporativo, garantindo que usuários autorizados tenham acesso rápido às suas credenciais sem comprometer a integridade dos dados.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Principais Funcionalidades
+* **Armazenamento Seguro:** Proteção de senhas com foco em segurança da informação.
+* **Gestão de Credenciais:** Cadastro, edição e exclusão de logins e senhas de forma simplificada.
+* **Interface Moderna e Responsiva:** Dashboard focado na experiência do usuário (UX) para agilizar o fluxo de trabalho.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tecnologias Utilizadas
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+O ecossistema do projeto foi construído com ferramentas modernas para garantir performance, tipagem estática e um design consistente:
 
-## Learn More
+* **Framework:** [Next.js](https://nextjs.org/)
+* **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
+* **ORM / Banco de Dados:** [Prisma](https://www.prisma.io/) (com suporte para integração com bancos SQL)
+* **Estilização:** [Tailwind CSS](https://tailwindcss.com/)
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   git clone [https://github.com/vicenzodev/JDPass.git](https://github.com/vicenzodev/JDPass.git)
+   cd JDPass
