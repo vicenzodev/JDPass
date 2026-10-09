@@ -12,31 +12,37 @@ export const POST = async (req:NextRequest) => {
             senha: body.senha
         });
 
-        (await cookies()).set('session_token',token , {
+        (await cookies()).set('session_token', token, {
             httpOnly: true,
-            maxAge: 60*60*24,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 60 * 60,
             path: '/',
             sameSite: 'lax'
         });
-        
-        const utaId = await getUserSession();
-        if(!utaId) throw new Error("Não foi reconhecido o usuário");
-        createLog({
+
+        const session = await getUserSession();
+        if(!session) throw new Error("Não foi possível criar a sessão do usuário");
+
+        await createLog({
             event:"Usuário acessado com sucesso",
             status:"200",
             date:new Date(),
-            utaId: utaId.id
+            utaId: session.id
         });
-        return NextResponse.json({message:'Login bem sucedido'},{status:200});
+
+        return NextResponse.json(
+            {message:'Login bem sucedido'},
+            {status:200}
+        );
     }catch(error){
-        createLog({
-            event:JSON.stringify(error),
-            status:"500",
-            date:new Date(),
-            utaId: 0
-        });
-        return NextResponse.json({
-            error: error
-            },{status: 500});
+        const message = error instanceof Error ? error.message : 'Erro inesperado';
+        const status = message === 'Credenciais inválidas' ? 401 : 500;
+
+        console.error('Falha no login:', message);
+
+        return NextResponse.json(
+            {error: status === 401 ? 'Credenciais inválidas' : 'Erro interno ao realizar login'},
+            {status}
+        );
     }
 }
