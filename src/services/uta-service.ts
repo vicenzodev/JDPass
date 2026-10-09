@@ -2,6 +2,8 @@ import { prisma } from "../utils/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+const BCRYPT_ROUNDS = 12;
+
 interface IUta{
     usuario:string,
     email:string,
@@ -15,10 +17,9 @@ interface ILogin{
 }
 
 export const createUta = async (data:IUta): Promise<Omit<IUta, 'senha'>> =>{
-    if(!data.senha) throw new Error("O campo SENHA é obrigatório**");
+    if(!data.senha) throw new Error("O campo SENHA é obrigatório");
 
-    const saltRounds = 2;
-    const cSenha = await bcrypt.hash(data.senha,saltRounds);
+    const cSenha = await bcrypt.hash(data.senha, BCRYPT_ROUNDS);
     const uta = await prisma.uta.create({
         data:{
             ...data,
@@ -27,7 +28,6 @@ export const createUta = async (data:IUta): Promise<Omit<IUta, 'senha'>> =>{
     });
 
     const {senha, ...result} = uta;
-    
     return result;
 }
 
@@ -35,7 +35,7 @@ export const loginUta = async (data:ILogin) =>{
     const uta = await prisma.uta.findFirst({
         where: {email: data.email},
     });
-    
+
     if(!uta) throw new Error("Credenciais inválidas");
 
     const isPasswordValid = await bcrypt.compare(data.senha,uta.senha);
@@ -43,7 +43,7 @@ export const loginUta = async (data:ILogin) =>{
 
     const secret = process.env.JWT_SECRET;
     if(!secret) throw new Error("A chave secreta JWT_SECRET não está configurada no .env");
-    
+
     const payload = {
         id: uta.id,
         email: uta.email,
@@ -67,8 +67,6 @@ export const listUta = async (currentUserId: number) => {
             }
         }
     });
-    
-    if(!uta) throw new Error("Nenhum usuário de sistema encontrado");
 
     const result = uta.map(({ senha, ...rest }) => rest);
     return result;
@@ -86,12 +84,10 @@ export const updateUta = async (id: number, data: Partial<IUta>) => {
     const uta = await prisma.uta.findFirst({ where: { id } });
     if (!uta) throw new Error("Usuário não encontrado");
 
-    let newData = { ...data };
+    const newData = { ...data };
 
     if (data.senha) {
-        const saltRounds = 2;
-        const cSenha = await bcrypt.hash(data.senha, saltRounds);
-        newData.senha = cSenha;
+        newData.senha = await bcrypt.hash(data.senha, BCRYPT_ROUNDS);
     } else {
         delete newData.senha;
     }
@@ -100,10 +96,10 @@ export const updateUta = async (id: number, data: Partial<IUta>) => {
         where: { id },
         data: newData,
     });
+
     const { senha, ...result } = updated;
     return result;
 };
-
 
 export const deleteUta = async (id:number): Promise<IUta> =>{
     const uta = await prisma.uta.delete({where:{id:id}});
