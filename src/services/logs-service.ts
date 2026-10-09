@@ -12,19 +12,36 @@ export const createLog = async (data:Ilogs): Promise<Ilogs> =>{
     return logs;
 }
 
-export const getAllLogs = async (): Promise<Ilogs[]> =>{
-    const logs = await prisma.logs.findMany({
+export const getAllLogs = async () =>{
+    return prisma.logs.findMany({
         orderBy: {
             date: 'desc'
         },
         include: {
-            uta: true,
+            uta: {
+                select: {
+                    id: true,
+                    usuario: true,
+                    email: true,
+                    cargo: true
+                }
+            },
         },
     });
-    return logs;
 }
 
 export const getLogById = async (id:number) =>{
-    const log = await prisma.logs.findUnique({where:{id: id}});
-    return log;
+    return prisma.logs.findUnique({
+        where:{id: id},
+        include: {
+            uta: {
+                select: {
+                    id: true,
+                    usuario: true,
+                    email: true,
+                    cargo: true
+                }
+            }
+        }
+    });
 }
